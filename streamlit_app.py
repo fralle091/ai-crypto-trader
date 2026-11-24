@@ -5,8 +5,14 @@ import pandas as pd
 from datetime import datetime
 from streamlit_autorefresh import st_autorefresh
 
+# PAGE CONFIG
 st.set_page_config(
+    page_title="MY AI TRADER",
+    page_icon="🤖",
+    layout="wide"
+)
 
+# PROFESSIONAL DESIGN
 st.markdown("""
 <style>
 .stApp {
@@ -21,6 +27,7 @@ header[data-testid="stHeader"] {
 .block-container {
     max-width: 1250px;
     padding-top: 2rem;
+    padding-bottom: 3rem;
 }
 
 h1, h2, h3 {
@@ -59,14 +66,13 @@ hr {
 </style>
 """, unsafe_allow_html=True)
 
-)
-
+# SETTINGS
 START_SEK = 1000
 EUR_SEK = 11.5
 FEE = 0.004
 
 st.title("🤖 MY AI TRADER")
-st.caption("Automated Crypto Paper Trading")
+st.caption("PROFESSIONAL CRYPTO PAPER TRADING")
 
 st_autorefresh(interval=60000, key="refresh")
 
@@ -74,7 +80,7 @@ exchange = ccxt.kraken({
     "enableRateLimit": True
 })
 
-# Create virtual account
+# VIRTUAL ACCOUNT
 if "cash" not in st.session_state:
     st.session_state.cash = START_SEK / EUR_SEK
     st.session_state.positions = {
@@ -84,7 +90,7 @@ if "cash" not in st.session_state:
     st.session_state.trades = []
     st.session_state.processed = {}
 
-# Market analysis
+# MARKET ANALYSIS
 def analyze(symbol):
     candles = exchange.fetch_ohlcv(
         symbol,
@@ -127,21 +133,27 @@ def analyze(symbol):
 
     last = df.iloc[-1]
 
-    if last["EMA20"] > last["EMA50"] and 50 < last["RSI"] < 68:
+    if pd.isna(last["RSI"]):
+        rsi = 50.0
+    else:
+        rsi = float(last["RSI"])
+
+    if last["EMA20"] > last["EMA50"] and 50 < rsi < 68:
         signal = "BUY"
-    elif last["EMA20"] < last["EMA50"] or last["RSI"] > 75:
+    elif last["EMA20"] < last["EMA50"] or rsi > 75:
         signal = "SELL"
     else:
         signal = "HOLD"
 
     return {
         "price": float(last["close"]),
-        "rsi": float(last["RSI"]),
+        "rsi": rsi,
         "signal": signal,
-        "candle": int(last["time"])
+        "candle": int(last["time"]),
+        "history": df.tail(40)
     }
 
-# Automatic simulated trading
+# PAPER TRADING
 def paper_trade(coin, data):
     signal = data["signal"]
     price = data["price"]
@@ -190,7 +202,7 @@ def paper_trade(coin, data):
         position["qty"] = 0.0
         position["cost"] = 0.0
 
-# Load market data
+# LOAD MARKET DATA
 results = {}
 errors = []
 
@@ -206,6 +218,7 @@ if errors:
     st.warning("Market data error: " + "; ".join(errors))
 
 if results:
+
     position_value = sum(
         st.session_state.positions[coin]["qty"] * data["price"]
         for coin, data in results.items()
@@ -213,47 +226,90 @@ if results:
 
     equity = st.session_state.cash + position_value
     total_sek = equity * EUR_SEK
+    profit = total_sek - START_SEK
 
+    # PORTFOLIO
     st.divider()
-    st.subheader("Portfolio")
+    st.subheader("💼 Portfolio Overview")
 
     a, b, c = st.columns(3)
 
-    a.metric("Portfolio value", f"{total_sek:.2f} SEK")
-    b.metric("Available cash", f"{st.session_state.cash * EUR_SEK:.2f} SEK")
-    c.metric("Profit / Loss", f"{total_sek - START_SEK:+.2f} SEK")
+    a.metric(
+        "Portfolio Value",
+        f"{total_sek:,.2f} SEK"
+    )
 
+    b.metric(
+        "Available Cash",
+        f"{st.session_state.cash * EUR_SEK:,.2f} SEK"
+    )
+
+    c.metric(
+        "Total Profit / Loss",
+        f"{profit:+,.2f} SEK"
+    )
+
+    # MARKET
     st.divider()
-    st.subheader("Market analysis")
+    st.subheader("📊 Market Overview")
 
     for coin, data in results.items():
+
         st.markdown(f"### {coin}")
 
         a, b, c = st.columns(3)
-        a.metric("Price", f"{data['price']:.2f} EUR")
-        b.metric("RSI", f"{data['rsi']:.2f}")
-        c.metric("Signal", data["signal"])
 
+        a.metric(
+            "Market Price",
+            f"{data['price']:,.2f} EUR"
+        )
+
+        b.metric(
+            "RSI Indicator",
+            f"{data['rsi']:.2f}"
+        )
+
+        c.metric(
+            "Trading Signal",
+            data["signal"]
+        )
+
+        chart = data["history"].set_index("time")
+        chart.index = pd.to_datetime(chart.index, unit="ms")
+
+        st.line_chart(
+            chart[["close", "EMA20", "EMA50"]],
+            height=250
+        )
+
+    # POSITIONS
     st.divider()
-    st.subheader("Positions")
+    st.subheader("📦 Open Positions")
 
     for coin, position in st.session_state.positions.items():
+
         st.write(
             f"**{coin}:** {position['qty']:.8f} coins"
         )
 
+    # TRADE HISTORY
     st.divider()
-    st.subheader("Trade history")
+    st.subheader("📜 Trade History")
 
     if st.session_state.trades:
         st.dataframe(
             pd.DataFrame(st.session_state.trades),
-            use_container_width=True
+            use_container_width=True,
+            hide_index=True
         )
     else:
-        st.info("No trades yet. Bot is analyzing the market.")
+        st.info("No trades yet. The bot is analyzing the market.")
 
 else:
     st.error("Could not retrieve market data.")
 
-st.caption("Simulation only • No real money or orders involved")
+st.divider()
+
+st.caption(
+    "MY AI TRADER | Simulation only | No real money or orders involved"
+)
