@@ -12,57 +12,46 @@ st.set_page_config(
     layout="wide"
 )
 
-# PROFESSIONAL DESIGN
+# DESIGN
 st.markdown("""
 <style>
 .stApp {
     background: #080D17;
     color: #F1F5F9;
 }
-
 header[data-testid="stHeader"] {
     background: transparent;
 }
-
 .block-container {
-    max-width: 1250px;
+    max-width: 1350px;
     padding-top: 2rem;
     padding-bottom: 3rem;
 }
-
 h1, h2, h3 {
     color: #F8FAFC !important;
-    font-weight: 700 !important;
 }
-
 [data-testid="stMetric"] {
     background: linear-gradient(145deg, #142236, #101927);
     border: 1px solid #26364B;
-    padding: 20px;
+    padding: 18px;
     border-radius: 14px;
 }
-
 [data-testid="stMetricLabel"] {
     color: #94A3B8 !important;
 }
-
 [data-testid="stMetricValue"] {
     color: #FFFFFF !important;
 }
-
+[data-testid="stSidebar"] {
+    background: #0D1726;
+}
 [data-testid="stDataFrame"] {
     border: 1px solid #26364B;
     border-radius: 12px;
 }
-
 hr {
     border-color: #26364B;
 }
-
-.stCaption {
-    color: #94A3B8;
-}
-
 </style>
 """, unsafe_allow_html=True)
 
@@ -71,16 +60,7 @@ START_SEK = 1000
 EUR_SEK = 11.5
 FEE = 0.004
 
-st.title("🤖 MY AI TRADER")
-st.caption("PROFESSIONAL CRYPTO PAPER TRADING")
-
-st_autorefresh(interval=60000, key="refresh")
-
-exchange = ccxt.kraken({
-    "enableRateLimit": True
-})
-
-# VIRTUAL ACCOUNT
+# SESSION STATE
 if "cash" not in st.session_state:
     st.session_state.cash = START_SEK / EUR_SEK
     st.session_state.positions = {
@@ -89,6 +69,30 @@ if "cash" not in st.session_state:
     }
     st.session_state.trades = []
     st.session_state.processed = {}
+    st.session_state.portfolio_history = []
+
+# SIDEBAR
+st.sidebar.title("🤖 MY AI TRADER")
+st.sidebar.caption("PROFESSIONAL TRADING TERMINAL")
+st.sidebar.divider()
+
+page = st.sidebar.radio(
+    "NAVIGATION",
+    ["Dashboard", "Portfolio", "Settings"]
+)
+
+st.sidebar.divider()
+st.sidebar.metric("Starting Balance", "1 000 SEK")
+st.sidebar.caption("PAPER TRADING MODE")
+st.sidebar.caption("Market data: Kraken")
+
+# AUTO REFRESH
+st_autorefresh(interval=60000, key="refresh")
+
+# EXCHANGE
+exchange = ccxt.kraken({
+    "enableRateLimit": True
+})
 
 # MARKET ANALYSIS
 def analyze(symbol):
@@ -107,6 +111,9 @@ def analyze(symbol):
     )
 
     df = df.iloc[:-1].copy()
+
+    if len(df) < 50:
+        raise ValueError("Not enough market data")
 
     df["EMA20"] = df["close"].ewm(
         span=20, adjust=False
@@ -132,11 +139,7 @@ def analyze(symbol):
     df["RSI"] = 100 - (100 / (1 + rs))
 
     last = df.iloc[-1]
-
-    if pd.isna(last["RSI"]):
-        rsi = 50.0
-    else:
-        rsi = float(last["RSI"])
+    rsi = float(last["RSI"]) if pd.notna(last["RSI"]) else 50.0
 
     if last["EMA20"] > last["EMA50"] and 50 < rsi < 68:
         signal = "BUY"
@@ -145,11 +148,16 @@ def analyze(symbol):
     else:
         signal = "HOLD"
 
+    change = (
+        (last["close"] / df.iloc[-25]["close"]) - 1
+    ) * 100
+
     return {
         "price": float(last["close"]),
         "rsi": rsi,
         "signal": signal,
         "candle": int(last["time"]),
+        "change": float(change),
         "history": df.tail(40)
     }
 
@@ -163,7 +171,6 @@ def paper_trade(coin, data):
         return
 
     st.session_state.processed[coin] = candle
-
     position = st.session_state.positions[coin]
 
     if signal == "BUY" and position["qty"] == 0:
@@ -202,7 +209,7 @@ def paper_trade(coin, data):
         position["qty"] = 0.0
         position["cost"] = 0.0
 
-# LOAD MARKET DATA
+# GET MARKET DATA
 results = {}
 errors = []
 
@@ -214,11 +221,8 @@ for coin in ["BTC", "ETH"]:
     except Exception as error:
         errors.append(f"{coin}: {error}")
 
-if errors:
-    st.warning("Market data error: " + "; ".join(errors))
-
+# PORTFOLIO VALUE
 if results:
-
     position_value = sum(
         st.session_state.positions[coin]["qty"] * data["price"]
         for coin, data in results.items()
@@ -228,73 +232,149 @@ if results:
     total_sek = equity * EUR_SEK
     profit = total_sek - START_SEK
 
-    # PORTFOLIO
+    st.session_state.portfolio_history.append({
+        "Time": datetime.now(),
+        "Value": total_sek
+    })
+
+    # Keep history manageable
+    st.session_state.portfolio_history = (
+        st.session_state.portfolio_history[-500:]
+    )
+
+# HEADER
+st.title("🤖 MY AI TRADER")
+
+if page == "Dashboard":
+
+    st.caption("MARKET INTELLIGENCE · LIVE PAPER TRADING")
     st.divider()
-    st.subheader("💼 Portfolio Overview")
 
-    a, b, c = st.columns(3)
+    if errors:
+        st.warning("Market data issue: " + "; ".join(errors))
 
-    a.metric(
-        "Portfolio Value",
-        f"{total_sek:,.2f} SEK"
-    )
-
-    b.metric(
-        "Available Cash",
-        f"{st.session_state.cash * EUR_SEK:,.2f} SEK"
-    )
-
-    c.metric(
-        "Total Profit / Loss",
-        f"{profit:+,.2f} SEK"
-    )
-
-    # MARKET
-    st.divider()
-    st.subheader("📊 Market Overview")
-
-    for coin, data in results.items():
-
-        st.markdown(f"### {coin}")
+    if results:
+        # TOP METRICS
+        st.subheader("Portfolio Overview")
 
         a, b, c = st.columns(3)
 
         a.metric(
-            "Market Price",
-            f"{data['price']:,.2f} EUR"
+            "Portfolio Value",
+            f"{total_sek:,.2f} SEK"
         )
 
         b.metric(
-            "RSI Indicator",
-            f"{data['rsi']:.2f}"
+            "Available Cash",
+            f"{st.session_state.cash * EUR_SEK:,.2f} SEK"
         )
 
         c.metric(
-            "Trading Signal",
-            data["signal"]
+            "Total Profit / Loss",
+            f"{profit:+,.2f} SEK"
         )
 
-        chart = data["history"].set_index("time")
-        chart.index = pd.to_datetime(chart.index, unit="ms")
+        st.divider()
+
+        # MARKET WATCH
+        st.subheader("📊 Market Watch")
+
+        for coin, data in results.items():
+            st.markdown(f"### {coin}")
+
+            a, b, c = st.columns(3)
+
+            a.metric(
+                "Price",
+                f"{data['price']:,.2f} EUR"
+            )
+
+            b.metric(
+                "24h Approx. Change",
+                f"{data['change']:+.2f}%"
+            )
+
+            c.metric(
+                "Trading Signal",
+                data["signal"]
+            )
+
+        st.divider()
+
+        # CHARTS
+        st.subheader("📈 Market Charts")
+
+        selected_coin = st.selectbox(
+            "Select market",
+            list(results.keys())
+        )
+
+        chart_data = results[selected_coin]["history"].copy()
+        chart_data["time"] = pd.to_datetime(
+            chart_data["time"], unit="ms"
+        )
+        chart_data = chart_data.set_index("time")
 
         st.line_chart(
-            chart[["close", "EMA20", "EMA50"]],
-            height=250
+            chart_data[["close", "EMA20", "EMA50"]],
+            height=350
         )
 
-    # POSITIONS
-    st.divider()
-    st.subheader("📦 Open Positions")
-
-    for coin, position in st.session_state.positions.items():
-
-        st.write(
-            f"**{coin}:** {position['qty']:.8f} coins"
+        st.caption(
+            "Close = market price · EMA20 and EMA50 = moving averages"
         )
 
-    # TRADE HISTORY
+    else:
+        st.error("Could not retrieve market data. Please try again.")
+
+elif page == "Portfolio":
+
+    st.caption("YOUR VIRTUAL ACCOUNT")
     st.divider()
-    st.subheader("📜 Trade History")
+
+    if results:
+        st.metric(
+            "Total Portfolio Value",
+            f"{total_sek:,.2f} SEK"
+        )
+
+        st.metric(
+            "Profit / Loss",
+            f"{profit:+,.2f} SEK"
+        )
+
+        st.subheader("Open Positions")
+
+        rows = []
+
+        for coin, position in st.session_state.positions.items():
+            price = results.get(coin, {}).get("price", 0)
+
+            rows.append({
+                "Asset": coin,
+                "Quantity": round(position["qty"], 8),
+                "Current Value (EUR)": round(
+                    position["qty"] * price, 2
+                )
+            })
+
+        st.dataframe(
+            pd.DataFrame(rows),
+            use_container_width=True,
+            hide_index=True
+        )
+
+        st.subheader("Portfolio Development")
+
+        if st.session_state.portfolio_history:
+            history = pd.DataFrame(
+                st.session_state.portfolio_history
+            ).set_index("Time")
+
+            st.line_chart(history, height=300)
+
+    st.divider()
+    st.subheader("Trade History")
 
     if st.session_state.trades:
         st.dataframe(
@@ -303,13 +383,47 @@ if results:
             hide_index=True
         )
     else:
-        st.info("No trades yet. The bot is analyzing the market.")
+        st.info("No trades have been made yet.")
 
-else:
-    st.error("Could not retrieve market data.")
+elif page == "Settings":
 
+    st.caption("BOT CONFIGURATION")
+    st.divider()
+
+    st.subheader("Trading Settings")
+
+    st.write("**Trading mode:** Paper Trading")
+    st.write("**Exchange:** Kraken")
+    st.write("**Markets:** BTC/EUR and ETH/EUR")
+    st.write("**Timeframe:** 1 hour")
+    st.write("**Strategy:** EMA20 + EMA50 + RSI")
+    st.write("**Position size:** 20% of available cash")
+    st.write("**Simulated trading fee:** 0.4%")
+
+    st.divider()
+
+    st.subheader("About the Strategy")
+
+    st.write(
+        "The bot analyzes moving averages and RSI "
+        "to generate BUY, SELL and HOLD signals."
+    )
+
+    st.warning(
+        "This is a rule-based paper trading system. "
+        "It does not use real money or place real orders."
+    )
+
+    st.divider()
+
+    st.subheader("Account Information")
+    st.write(f"Starting balance: {START_SEK} SEK")
+    st.write("Currency conversion: 1 EUR = 11.5 SEK")
+
+# FOOTER
 st.divider()
 
 st.caption(
-    "MY AI TRADER | Simulation only | No real money or orders involved"
+    "MY AI TRADER  |  PAPER TRADING ONLY  |  "
+    "Market data provided by Kraken"
 )
