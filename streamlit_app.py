@@ -6,9 +6,59 @@ from datetime import datetime
 from streamlit_autorefresh import st_autorefresh
 
 st.set_page_config(
-    page_title="MY AI TRADER",
-    page_icon="🤖",
-    layout="wide"
+
+st.markdown("""
+<style>
+.stApp {
+    background: #080D17;
+    color: #F1F5F9;
+}
+
+header[data-testid="stHeader"] {
+    background: transparent;
+}
+
+.block-container {
+    max-width: 1250px;
+    padding-top: 2rem;
+}
+
+h1, h2, h3 {
+    color: #F8FAFC !important;
+    font-weight: 700 !important;
+}
+
+[data-testid="stMetric"] {
+    background: linear-gradient(145deg, #142236, #101927);
+    border: 1px solid #26364B;
+    padding: 20px;
+    border-radius: 14px;
+}
+
+[data-testid="stMetricLabel"] {
+    color: #94A3B8 !important;
+}
+
+[data-testid="stMetricValue"] {
+    color: #FFFFFF !important;
+}
+
+[data-testid="stDataFrame"] {
+    border: 1px solid #26364B;
+    border-radius: 12px;
+}
+
+hr {
+    border-color: #26364B;
+}
+
+.stCaption {
+    color: #94A3B8;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
 )
 
 START_SEK = 1000
