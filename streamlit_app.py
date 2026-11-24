@@ -1,3 +1,4 @@
+
 import os
 from datetime import datetime, timezone
 from itertools import product
@@ -10,92 +11,296 @@ from streamlit_autorefresh import st_autorefresh
 
 
 # ============================================================
-# NEXUS — PROFESSIONAL PAPER TRADING & RESEARCH TERMINAL
-# Simulation only. No real order execution.
+# NEXUS — PREMIUM DIGITAL ASSET TERMINAL
+# Paper trading only. No real orders.
 # ============================================================
 
 st.set_page_config(
-    page_title="NEXUS | Trading Intelligence",
+    page_title="NEXUS | Intelligence Terminal",
     page_icon="◈",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="expanded"
 )
 
-# ----------------------------- DESIGN -----------------------------
+# ------------------------- DESIGN SYSTEM -------------------------
 
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
 :root {
-  --bg:#080D16; --panel:#101A2A; --panel2:#142238; --line:#263951;
-  --text:#EAF1FA; --muted:#8FA2BA; --green:#35D6A2; --red:#FF647C;
-  --blue:#78A6FF; --gold:#E9BE72; --purple:#B39AFF;
+    --bg:#070B12;
+    --surface:#0D1420;
+    --surface2:#111C2B;
+    --surface3:#172538;
+    --border:#202F43;
+    --text:#EDF3FC;
+    --muted:#8192A9;
+    --green:#36D6A0;
+    --red:#FF657A;
+    --blue:#6FA7FF;
+    --purple:#AD91FF;
 }
-html, body, [class*="css"] {font-family:'DM Sans',sans-serif;}
-.stApp {background:radial-gradient(ellipse at 80% -10%,#1B3150 0%,transparent 36%),var(--bg);color:var(--text);}
-header[data-testid="stHeader"] {background:rgba(8,13,22,.72);}
-.block-container {max-width:1580px;padding-top:1.35rem;padding-bottom:3rem;}
-h1,h2,h3 {font-family:'Space Grotesk',sans-serif!important;color:var(--text)!important;letter-spacing:-.6px;}
-h1 {font-size:2.15rem!important;}
-[data-testid="stSidebar"] {background:#0A1220;border-right:1px solid var(--line);}
-[data-testid="stMetric"] {background:linear-gradient(145deg,#172840,#101A2A);border:1px solid var(--line);padding:17px 18px;border-radius:15px;}
-[data-testid="stMetricLabel"] {color:var(--muted)!important;font-size:.76rem;}
-[data-testid="stMetricValue"] {font-family:'Space Grotesk',sans-serif;color:var(--text)!important;}
-[data-testid="stMetricDelta"] {font-family:'DM Mono',monospace;}
-.stButton>button,.stDownloadButton>button {border:1px solid #38516F;border-radius:10px;background:#192B43;color:#F4F7FC;font-weight:650;min-height:2.55rem;}
-.stButton>button:hover,.stDownloadButton>button:hover {border-color:var(--blue);background:#223B5B;color:white;}
-button[kind="primary"] {background:linear-gradient(100deg,#2866C7,#397DE0)!important;border:0!important;}
-div[data-baseweb="select"]>div,.stTextInput input,.stNumberInput input,.stTextArea textarea {background:#111E30;border-color:#344A65;color:white;border-radius:9px;}
-[data-testid="stDataFrame"] {border:1px solid var(--line);border-radius:12px;}
-hr {border-color:var(--line);}
-.nx-brand {font:700 25px 'Space Grotesk';letter-spacing:2px;color:#F5F8FF;}
-.nx-sub {font:500 9px 'DM Mono';letter-spacing:2.4px;color:#8FA2BA;margin-top:-3px;}
-.eyebrow {font:600 10px 'DM Mono';letter-spacing:2px;color:#91A5C0;text-transform:uppercase;margin-bottom:8px;}
-.panel {background:linear-gradient(145deg,#14243A,#101A2A);border:1px solid #2A405C;border-radius:15px;padding:17px 19px;margin-bottom:10px;}
-.panel-title {font:600 11px 'DM Mono';letter-spacing:1.5px;color:#91A5C0;text-transform:uppercase;margin-bottom:8px;}
-.big-number {font:600 25px 'Space Grotesk';color:#F1F6FD;}
-.muted {font-size:12px;color:#8FA2BA;}
-.pill {display:inline-block;border:1px solid #314965;background:#14243A;padding:5px 9px;border-radius:20px;font:500 10px 'DM Mono';color:#B7C9DF;}
-div[data-testid="stChatMessage"] {background:#111E30;border:1px solid #293F5B;border-radius:13px;padding:12px;}
-.stTabs [data-baseweb="tab-list"] {gap:7px;background:#0E1928;padding:6px;border:1px solid #263951;border-radius:12px;}
-.stTabs [data-baseweb="tab"] {border-radius:8px;color:#9FB0C5;}
-.stTabs [aria-selected="true"] {background:#203753;color:white;}
+
+html, body, [class*="css"] {
+    font-family:'DM Sans',sans-serif;
+}
+
+.stApp {
+    background:
+        radial-gradient(ellipse at 75% 0%, rgba(38,82,130,.17), transparent 35%),
+        var(--bg);
+    color:var(--text);
+}
+
+.block-container {
+    max-width:1700px;
+    padding-top:1.5rem;
+    padding-bottom:3rem;
+}
+
+h1,h2,h3 {
+    font-family:'Space Grotesk',sans-serif !important;
+    color:var(--text) !important;
+    letter-spacing:-.7px;
+}
+
+h1 {font-size:2.2rem !important;}
+h2 {font-size:1.55rem !important;}
+h3 {font-size:1.1rem !important;}
+
+[data-testid="stSidebar"] {
+    background:#090F19;
+    border-right:1px solid var(--border);
+}
+
+[data-testid="stSidebar"] > div:first-child {
+    padding-top:1.3rem;
+}
+
+[data-testid="stMetric"] {
+    background:linear-gradient(145deg,#142237,#0D1725);
+    border:1px solid #263A53;
+    padding:18px;
+    border-radius:13px;
+}
+
+[data-testid="stMetricLabel"] {
+    color:var(--muted) !important;
+    font-size:.75rem;
+}
+
+[data-testid="stMetricValue"] {
+    color:var(--text) !important;
+    font-family:'Space Grotesk',sans-serif;
+}
+
+[data-testid="stMetricDelta"] {
+    font-family:'DM Mono',monospace;
+}
+
+.stButton>button,
+.stDownloadButton>button {
+    background:#17283D;
+    color:#EDF3FC;
+    border:1px solid #304762;
+    border-radius:9px;
+    min-height:2.6rem;
+    font-weight:650;
+    transition:.2s;
+}
+
+.stButton>button:hover,
+.stDownloadButton>button:hover {
+    background:#223B59;
+    border-color:#6FA7FF;
+    color:white;
+}
+
+button[kind="primary"] {
+    background:linear-gradient(100deg,#2466C7,#4388EC) !important;
+    border:0 !important;
+}
+
+div[data-baseweb="select"]>div,
+.stTextInput input,
+.stNumberInput input,
+.stTextArea textarea {
+    background:#111D2C;
+    border-color:#2C4059;
+    color:white;
+    border-radius:9px;
+}
+
+[data-testid="stDataFrame"] {
+    border:1px solid var(--border);
+    border-radius:11px;
+}
+
+hr {
+    border-color:var(--border);
+}
+
+.nx-logo {
+    font-family:'Space Grotesk',sans-serif;
+    font-size:29px;
+    font-weight:700;
+    letter-spacing:3px;
+    color:#F4F8FF;
+}
+
+.nx-subtitle {
+    font-family:'DM Mono',monospace;
+    font-size:9px;
+    letter-spacing:2px;
+    color:#8094AE;
+    margin-top:-5px;
+}
+
+.eyebrow {
+    font-family:'DM Mono',monospace;
+    color:#7F9BBC;
+    font-size:10px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    margin-bottom:8px;
+}
+
+.panel {
+    background:linear-gradient(145deg,#14243A,#0D1725);
+    border:1px solid #263B55;
+    border-radius:14px;
+    padding:19px;
+    margin-bottom:12px;
+}
+
+.panel-label {
+    color:#8DA3BF;
+    font-family:'DM Mono',monospace;
+    font-size:10px;
+    letter-spacing:1.6px;
+    text-transform:uppercase;
+}
+
+.panel-value {
+    color:#F1F6FD;
+    font-family:'Space Grotesk',sans-serif;
+    font-size:27px;
+    font-weight:600;
+    margin-top:8px;
+}
+
+.panel-note {
+    color:#8FA2BA;
+    font-size:11px;
+    margin-top:5px;
+}
+
+.status {
+    display:inline-block;
+    padding:6px 11px;
+    border-radius:30px;
+    background:#102D29;
+    color:#49D9A8;
+    border:1px solid #245448;
+    font-family:'DM Mono',monospace;
+    font-size:10px;
+    letter-spacing:1px;
+}
+
+.tag {
+    display:inline-block;
+    padding:5px 9px;
+    border:1px solid #304760;
+    background:#14243A;
+    border-radius:30px;
+    color:#B8CBE1;
+    font-family:'DM Mono',monospace;
+    font-size:10px;
+}
+
+div[data-testid="stChatMessage"] {
+    background:#111D2C;
+    border:1px solid #293D55;
+    border-radius:12px;
+}
+
+.stTabs [data-baseweb="tab-list"] {
+    gap:8px;
+    background:#0D1725;
+    border:1px solid #26384E;
+    padding:6px;
+    border-radius:11px;
+}
+
+.stTabs [data-baseweb="tab"] {
+    color:#9EB0C6;
+    border-radius:8px;
+}
+
+.stTabs [aria-selected="true"] {
+    background:#203854;
+    color:white;
+}
+
+[data-testid="stExpander"] {
+    border:1px solid var(--border);
+    border-radius:10px;
+}
+
+footer {visibility:hidden;}
 </style>
 """, unsafe_allow_html=True)
 
 
-# ----------------------------- STATE -----------------------------
+# ------------------------- SESSION STATE -------------------------
 
 DEFAULTS = {
+    "cash": 1000 / 11.5,
     "starting_balance": 1000.0,
-    "cash": 1000.0 / 11.5,
-    "risk": 20,
-    "fee": 0.4,
-    "refresh": 60,
-    "timeframe": "1h",
-    "auto_trade": False,
     "currency_rate": 11.5,
-    "positions": {"BTC": {"qty": 0.0, "cost": 0.0}, "ETH": {"qty": 0.0, "cost": 0.0}},
+    "position_size": 20,
+    "fee": 0.4,
+    "timeframe": "1h",
+    "refresh": 60,
+    "auto_trade": False,
+    "positions": {
+        "BTC": {"qty": 0.0, "cost": 0.0},
+        "ETH": {"qty": 0.0, "cost": 0.0}
+    },
     "trades": [],
     "processed": {},
     "history": [],
     "chat": [],
-    "last_backtest": None,
-    "last_optimization": None,
-    "last_comparison": None,
+    "comparison": None,
+    "backtest": None,
+    "optimization": None,
 }
+
 for key, value in DEFAULTS.items():
     if key not in st.session_state:
         st.session_state[key] = value.copy() if isinstance(value, (dict, list)) else value
 
-exchange = ccxt.kraken({"enableRateLimit": True, "timeout": 20000})
+
+# ------------------------- MARKET CONNECTION -------------------------
+
+@st.cache_resource
+def get_exchange():
+    return ccxt.kraken({
+        "enableRateLimit": True,
+        "timeout": 20000
+    })
 
 
-# ----------------------------- INDICATORS -----------------------------
+exchange = get_exchange()
 
-def add_indicators(source, fast=20, slow=50):
-    df = source.copy()
+
+# ------------------------- INDICATORS -------------------------
+
+def add_indicators(df, fast=20, slow=50):
+    df = df.copy()
     close = df["close"]
+
     df["EMA20"] = close.ewm(span=20, adjust=False).mean()
     df["EMA50"] = close.ewm(span=50, adjust=False).mean()
     df["EMA_FAST"] = close.ewm(span=fast, adjust=False).mean()
@@ -104,40 +309,61 @@ def add_indicators(source, fast=20, slow=50):
     delta = close.diff()
     gain = delta.clip(lower=0)
     loss = -delta.clip(upper=0)
+
     avg_gain = gain.ewm(alpha=1/14, adjust=False, min_periods=14).mean()
     avg_loss = loss.ewm(alpha=1/14, adjust=False, min_periods=14).mean()
+
     rs = avg_gain / avg_loss.replace(0, float("nan"))
     df["RSI"] = 100 - 100 / (1 + rs)
 
     ema12 = close.ewm(span=12, adjust=False).mean()
     ema26 = close.ewm(span=26, adjust=False).mean()
+
     df["MACD"] = ema12 - ema26
     df["MACD_SIGNAL"] = df["MACD"].ewm(span=9, adjust=False).mean()
     df["MACD_HIST"] = df["MACD"] - df["MACD_SIGNAL"]
 
-    mid = close.rolling(20, min_periods=20).mean()
-    std = close.rolling(20, min_periods=20).std()
+    mid = close.rolling(20).mean()
+    std = close.rolling(20).std()
+
     df["BB_MID"] = mid
     df["BB_UPPER"] = mid + 2 * std
     df["BB_LOWER"] = mid - 2 * std
-    df["BB_WIDTH"] = (df["BB_UPPER"] - df["BB_LOWER"]) / mid.replace(0, float("nan"))
 
-    prev_close = close.shift(1)
-    true_range = pd.concat([
+    previous = close.shift(1)
+    tr = pd.concat([
         df["high"] - df["low"],
-        (df["high"] - prev_close).abs(),
-        (df["low"] - prev_close).abs()
+        (df["high"] - previous).abs(),
+        (df["low"] - previous).abs()
     ], axis=1).max(axis=1)
-    df["ATR"] = true_range.ewm(alpha=1/14, adjust=False, min_periods=14).mean()
+
+    df["ATR"] = tr.ewm(alpha=1/14, adjust=False, min_periods=14).mean()
     df["ATR_PCT"] = df["ATR"] / close * 100
+
     return df
 
 
-def signal_for(row, strategy="NEXUS Multi-Factor", params=None):
+# ------------------------- STRATEGY ENGINE -------------------------
+
+STRATEGIES = [
+    "NEXUS Multi-Factor",
+    "NEXUS Baseline",
+    "EMA Crossover",
+    "RSI Reversal",
+    "Bollinger Reversal",
+    "MACD Trend"
+]
+
+
+def get_signal(row, strategy="NEXUS Multi-Factor", params=None):
     params = params or {}
-    required = ["RSI", "EMA_FAST", "EMA_SLOW", "MACD", "MACD_SIGNAL",
-                "BB_UPPER", "BB_LOWER", "ATR"]
-    if any(pd.isna(row.get(k)) for k in required):
+
+    required = [
+        "RSI", "EMA_FAST", "EMA_SLOW",
+        "MACD", "MACD_SIGNAL", "BB_UPPER", "BB_LOWER"
+    ]
+
+    if any(pd.isna(row.get(x)) for x in required):
         return "HOLD"
 
     rsi = float(row["RSI"])
@@ -154,7 +380,11 @@ def signal_for(row, strategy="NEXUS Multi-Factor", params=None):
         return "HOLD"
 
     if strategy == "EMA Crossover":
-        return "BUY" if trend_up else "SELL" if trend_down else "HOLD"
+        if trend_up:
+            return "BUY"
+        if trend_down:
+            return "SELL"
+        return "HOLD"
 
     if strategy == "RSI Reversal":
         if rsi < params.get("rsi_buy", 30):
@@ -177,420 +407,784 @@ def signal_for(row, strategy="NEXUS Multi-Factor", params=None):
             return "SELL"
         return "HOLD"
 
-    # Multi-factor: require trend + momentum confirmation; avoid chasing extremes.
     buy_rsi = params.get("rsi_buy", 48)
     sell_rsi = params.get("rsi_sell", 72)
-    if trend_up and macd_up and buy_rsi <= rsi <= 68:
+    macd_filter = params.get("macd_filter", True)
+
+    if trend_up and buy_rsi <= rsi <= 68 and (macd_up or not macd_filter):
         return "BUY"
+
     if trend_down and (macd_down or rsi >= sell_rsi):
         return "SELL"
+
     return "HOLD"
 
 
-def analyze(symbol, timeframe):
-    candles = exchange.fetch_ohlcv(symbol, timeframe=timeframe, limit=180)
+# ------------------------- LIVE DATA -------------------------
+
+def get_market_data(symbol, timeframe):
+    candles = exchange.fetch_ohlcv(
+        symbol,
+        timeframe=timeframe,
+        limit=180
+    )
+
     if not candles:
-        raise ValueError("No market data returned.")
-    df = pd.DataFrame(candles, columns=["time", "open", "high", "low", "close", "volume"])
-    df = df.iloc[:-1].copy()  # exclude the still-forming candle
+        raise ValueError("No market data returned")
+
+    df = pd.DataFrame(
+        candles,
+        columns=["time", "open", "high", "low", "close", "volume"]
+    )
+
+    # Ignore unfinished candle
+    df = df.iloc[:-1].copy()
+
     if len(df) < 80:
-        raise ValueError("Not enough completed candles.")
+        raise ValueError("Not enough completed candles")
+
     df = add_indicators(df)
     last = df.iloc[-1]
-    previous = df.iloc[-25]["close"]
+
     return {
         "price": float(last["close"]),
-        "rsi": float(last["RSI"]) if pd.notna(last["RSI"]) else 50.0,
-        "signal": signal_for(last, "NEXUS Multi-Factor"),
-        "change": float((last["close"] / previous - 1) * 100),
+        "rsi": float(last["RSI"]) if pd.notna(last["RSI"]) else 50,
+        "signal": get_signal(last),
+        "change": float((last["close"] / df.iloc[-25]["close"] - 1) * 100),
         "candle": int(last["time"]),
         "history": df
     }
 
 
-# ----------------------------- HISTORICAL DATA -----------------------------
-
 @st.cache_data(ttl=300, show_spinner=False)
 def fetch_history(symbol, timeframe, limit):
-    client = ccxt.kraken({"enableRateLimit": True, "timeout": 25000})
-    candles = client.fetch_ohlcv(symbol, timeframe=timeframe, limit=limit)
-    if not candles:
-        raise ValueError("Kraken returned no historical candles.")
-    df = pd.DataFrame(candles, columns=["time", "open", "high", "low", "close", "volume"])
+    client = ccxt.kraken({
+        "enableRateLimit": True,
+        "timeout": 25000
+    })
+
+    candles = client.fetch_ohlcv(
+        symbol,
+        timeframe=timeframe,
+        limit=limit
+    )
+
+    df = pd.DataFrame(
+        candles,
+        columns=["time", "open", "high", "low", "close", "volume"]
+    )
+
     df = df.iloc[:-1].copy()
     df["Date"] = pd.to_datetime(df["time"], unit="ms", utc=True)
+
     df = add_indicators(df).reset_index(drop=True)
+
     if len(df) < 100:
-        raise ValueError("Not enough historical data. Try another timeframe or candle count.")
+        raise ValueError("Not enough historical data")
+
     return df
 
 
-# ----------------------------- BACKTEST ENGINE -----------------------------
+# ------------------------- PAPER TRADING -------------------------
 
-def run_backtest(df, starting_balance, position_pct, fee_pct, strategy,
-                 params=None, stop_loss=0, take_profit=0, max_dd=0,
-                 trailing_stop=0):
-    """Close-based signals execute at next open. Intrabar exits use conservative stop-first ordering."""
+def paper_trade(coin, data):
+    if not st.session_state.auto_trade:
+        return
+
+    candle = data["candle"]
+
+    if st.session_state.processed.get(coin) == candle:
+        return
+
+    st.session_state.processed[coin] = candle
+
+    pos = st.session_state.positions[coin]
+    price = data["price"]
+    fee = st.session_state.fee / 100
+
+    if data["signal"] == "BUY" and pos["qty"] == 0:
+        amount = st.session_state.cash * st.session_state.position_size / 100
+
+        if amount < 5:
+            return
+
+        qty = amount * (1 - fee) / price
+        st.session_state.cash -= amount
+
+        pos["qty"] = qty
+        pos["cost"] = amount
+
+        st.session_state.trades.append({
+            "Time": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
+            "Asset": coin,
+            "Action": "BUY",
+            "Price EUR": round(price, 2),
+            "Amount EUR": round(amount, 2)
+        })
+
+    elif data["signal"] == "SELL" and pos["qty"] > 0:
+        proceeds = pos["qty"] * price * (1 - fee)
+        st.session_state.cash += proceeds
+
+        st.session_state.trades.append({
+            "Time": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
+            "Asset": coin,
+            "Action": "SELL",
+            "Price EUR": round(price, 2),
+            "Amount EUR": round(proceeds, 2)
+        })
+
+        pos["qty"] = 0.0
+        pos["cost"] = 0.0
+
+
+# ------------------------- BACKTEST ENGINE -------------------------
+
+def run_backtest(
+    df, balance, position, fee, strategy,
+    params=None, stop_loss=0, take_profit=0,
+    max_dd=0, trailing_stop=0
+):
     params = params or {}
-    fee = fee_pct / 100
-    cash = float(starting_balance)
+    fee_rate = fee / 100
+
+    cash = float(balance)
     qty = 0.0
-    entry_cost = entry_price = high_water = 0.0
-    entry_date = None
-    trades, points = [], []
-    peak_equity = float(starting_balance)
+    entry_price = 0.0
+    entry_cost = 0.0
+    high_water = 0.0
+    trades = []
+    points = []
+
+    peak = float(balance)
     halted = False
+
     warmup = min(80, max(30, len(df) // 5))
-    points.append({"Date": df.iloc[warmup]["Date"], "Equity": cash})
+    points.append({
+        "Date": df.iloc[warmup]["Date"],
+        "Equity": cash
+    })
+
+    def close_position(price, reason, date):
+        nonlocal cash, qty, entry_price, entry_cost, high_water
+
+        proceeds = qty * price * (1 - fee_rate)
+        pnl = proceeds - entry_cost
+
+        trades.append({
+            "Exit Date": date,
+            "Exit Reason": reason,
+            "Entry Price": entry_price,
+            "Exit Price": price,
+            "Profit": pnl,
+            "Return %": pnl / entry_cost * 100 if entry_cost else 0
+        })
+
+        cash += proceeds
+        qty = 0.0
+        entry_price = 0.0
+        entry_cost = 0.0
+        high_water = 0.0
 
     for i in range(warmup, len(df) - 1):
         signal_row = df.iloc[i]
         candle = df.iloc[i + 1]
-        op, hi, lo, cl = map(float, [candle["open"], candle["high"], candle["low"], candle["close"]])
+
+        op = float(candle["open"])
+        hi = float(candle["high"])
+        lo = float(candle["low"])
+        cl = float(candle["close"])
         date = candle["Date"]
-        exit_price, exit_reason = None, None
+
+        exit_price = None
+        exit_reason = None
 
         if qty > 0:
-            high_water = max(high_water, hi)
             stop_candidates = []
-            if stop_loss > 0:
-                stop_candidates.append((entry_price * (1 - stop_loss / 100), "Stop-loss"))
-            if trailing_stop > 0:
-                stop_candidates.append((high_water * (1 - trailing_stop / 100), "Trailing stop"))
-            active_stop = max([x[0] for x in stop_candidates], default=None)
-            target = entry_price * (1 + take_profit / 100) if take_profit > 0 else None
-            # Gap-through stop fills at the open; otherwise at stop level.
-            if active_stop is not None and lo <= active_stop:
-                exit_price = min(op, active_stop) if op < active_stop else active_stop
-                exit_reason = "Stop / trailing stop"
-            elif target is not None and hi >= target:
-                exit_price, exit_reason = max(op, target), "Take-profit"
 
-        def close_position(price, reason, trade_date):
-            nonlocal cash, qty, entry_cost, entry_price, entry_date, high_water
-            proceeds = qty * price * (1 - fee)
-            pnl = proceeds - entry_cost
-            trades.append({
-                "Entry Date": entry_date, "Exit Date": trade_date,
-                "Exit Reason": reason, "Entry Price": entry_price,
-                "Exit Price": price, "Entry Cost": entry_cost,
-                "Exit Value": proceeds, "Profit": pnl,
-                "Return %": pnl / entry_cost * 100 if entry_cost else 0
-            })
-            cash += proceeds
-            qty, entry_cost, entry_price, high_water, entry_date = 0.0, 0.0, 0.0, 0.0, None
+            if stop_loss > 0:
+                stop_candidates.append(
+                    (entry_price * (1 - stop_loss / 100), "Stop-loss")
+                )
+
+            if trailing_stop > 0 and high_water > 0:
+                stop_candidates.append(
+                    (high_water * (1 - trailing_stop / 100), "Trailing stop")
+                )
+
+            active_stop = max(
+                [x[0] for x in stop_candidates],
+                default=None
+            )
+
+            target = (
+                entry_price * (1 + take_profit / 100)
+                if take_profit > 0 else None
+            )
+
+            if active_stop is not None and lo <= active_stop:
+                exit_price = min(op, active_stop)
+                exit_reason = "Stop-loss"
+
+            elif target is not None and hi >= target:
+                exit_price = max(op, target)
+                exit_reason = "Take-profit"
 
         if exit_price is not None and qty > 0:
-            close_position(float(exit_price), exit_reason, date)
+            close_position(exit_price, exit_reason, date)
 
-        equity_before_signal = cash + qty * cl
-        peak_equity = max(peak_equity, equity_before_signal)
-        dd = (equity_before_signal / peak_equity - 1) * 100 if peak_equity else 0
-        if max_dd > 0 and dd <= -max_dd and not halted:
+        equity = cash + qty * cl
+        peak = max(peak, equity)
+
+        drawdown = (equity / peak - 1) * 100 if peak else 0
+
+        if max_dd > 0 and drawdown <= -max_dd and not halted:
             if qty > 0:
-                close_position(cl, "Account drawdown stop", date)
+                close_position(cl, "Drawdown limit", date)
             halted = True
 
         if not halted:
-            signal = signal_for(signal_row, strategy, params)
+            signal = get_signal(signal_row, strategy, params)
+
             if signal == "SELL" and qty > 0:
                 close_position(op, "Strategy exit", date)
+
             elif signal == "BUY" and qty == 0 and cash > 1:
-                allocation = cash * position_pct / 100
-                qty = allocation * (1 - fee) / op
-                entry_cost, entry_price, entry_date, high_water = allocation, op, date, op
+                allocation = cash * position / 100
+                qty = allocation * (1 - fee_rate) / op
+                entry_cost = allocation
+                entry_price = op
+                high_water = op
                 cash -= allocation
 
+        if qty > 0:
+            high_water = max(high_water, hi)
+
         equity = cash + qty * cl
-        peak_equity = max(peak_equity, equity)
         points.append({"Date": date, "Equity": equity})
 
     last = df.iloc[-1]
+
     if qty > 0:
         close_position(float(last["close"]), "End of test", last["Date"])
+
     final_equity = cash
+
     if points:
         points[-1]["Equity"] = final_equity
+
     equity_df = pd.DataFrame(points)
 
-    first_exec = min(warmup + 1, len(df) - 1)
-    buy_price = float(df.iloc[first_exec]["open"])
-    end_price = float(df.iloc[-1]["close"])
-    buy_qty = starting_balance * (1 - fee) / buy_price
-    buy_hold_value = buy_qty * end_price * (1 - fee)
+    total_return = (final_equity / balance - 1) * 100
 
-    total_return = (final_equity / starting_balance - 1) * 100
-    buy_hold_return = (buy_hold_value / starting_balance - 1) * 100
-    running_peak = equity_df["Equity"].cummax()
-    drawdown = (equity_df["Equity"] / running_peak - 1) * 100
-    max_drawdown = float(drawdown.min()) if len(drawdown) else 0.0
     wins = [t for t in trades if t["Profit"] > 0]
     losses = [t for t in trades if t["Profit"] < 0]
+
     gross_profit = sum(t["Profit"] for t in wins)
     gross_loss = abs(sum(t["Profit"] for t in losses))
-    profit_factor = gross_profit / gross_loss if gross_loss else (float("inf") if gross_profit else 0.0)
+
+    profit_factor = (
+        gross_profit / gross_loss
+        if gross_loss > 0
+        else (float("inf") if gross_profit > 0 else 0)
+    )
+
+    running_peak = equity_df["Equity"].cummax()
+    dd = (equity_df["Equity"] / running_peak - 1) * 100
+
     metrics = {
         "final_equity": final_equity,
         "total_return": total_return,
-        "buy_hold_value": buy_hold_value,
-        "buy_hold_return": buy_hold_return,
         "trades": len(trades),
-        "win_rate": len(wins) / len(trades) * 100 if trades else 0.0,
-        "max_drawdown": max_drawdown,
-        "profit_factor": profit_factor,
-        "gross_profit": gross_profit,
-        "gross_loss": gross_loss,
+        "win_rate": len(wins) / len(trades) * 100 if trades else 0,
+        "max_drawdown": float(dd.min()) if len(dd) else 0,
+        "profit_factor": profit_factor
     }
+
     return metrics, equity_df, trades
 
 
-def score_metrics(metrics):
-    """Risk-aware ranking: reward return, penalize drawdown and tiny samples."""
-    ret = metrics["total_return"]
-    dd = abs(metrics["max_drawdown"])
-    trades = metrics["trades"]
-    pf = min(metrics["profit_factor"], 3) if metrics["profit_factor"] != float("inf") else 3
-    sample_penalty = 8 if trades < 5 else 3 if trades < 10 else 0
-    return ret - 0.65 * dd + min(pf, 3) * 1.5 - sample_penalty
+def score_metrics(m):
+    pf = min(m["profit_factor"], 3) if m["profit_factor"] != float("inf") else 3
+    penalty = 8 if m["trades"] < 5 else 3 if m["trades"] < 10 else 0
+
+    return (
+        m["total_return"]
+        - abs(m["max_drawdown"]) * .65
+        + pf * 1.5
+        - penalty
+    )
 
 
-def optimize_strategy(df, balance, position, fee, sl, tp, max_dd, trailing):
-    """Small, transparent grid search on training data; evaluate the winner on a later holdout."""
-    split = int(len(df) * 0.70)
-    warmup_overlap = 90
+def optimize_strategy(df, balance, position, fee, sl, tp, maxdd, trailing):
+    split = int(len(df) * .7)
+
     train = df.iloc[:split].reset_index(drop=True)
-    test_start = max(0, split - warmup_overlap)
-    test = df.iloc[test_start:].reset_index(drop=True)
+    test = df.iloc[max(0, split - 90):].reset_index(drop=True)
 
     candidates = []
-    grid = product(
-        [10, 20, 30],       # fast EMA
-        [40, 50, 80],       # slow EMA
-        [45, 50, 55],       # RSI lower boundary
-        [68, 72, 76],       # RSI exit boundary
-        [0, 1],             # MACD confirmation on/off
-    )
-    for fast, slow, rsi_buy, rsi_sell, macd_filter in grid:
+
+    for fast, slow, rsi_buy, rsi_sell, macd_filter in product(
+        [10, 20, 30],
+        [40, 50, 80],
+        [45, 50, 55],
+        [68, 72, 76],
+        [True, False]
+    ):
         if fast >= slow or rsi_buy >= rsi_sell:
             continue
+
         params = {
-            "fast": fast, "slow": slow,
-            "rsi_buy": rsi_buy, "rsi_sell": rsi_sell,
-            "macd_filter": bool(macd_filter)
+            "fast": fast,
+            "slow": slow,
+            "rsi_buy": rsi_buy,
+            "rsi_sell": rsi_sell,
+            "macd_filter": macd_filter
         }
+
         train_ind = add_indicators(train, fast, slow)
-        # Candidate signal uses the same common engine; MACD is always part of multi-factor logic.
+
         metrics, _, _ = run_backtest(
-            train_ind, balance, position, fee, "NEXUS Multi-Factor",
-            params, sl, tp, max_dd, trailing
+            train_ind, balance, position, fee,
+            "NEXUS Multi-Factor", params,
+            sl, tp, maxdd, trailing
         )
+
         candidates.append({
             **params,
             "Training Return %": metrics["total_return"],
-            "Training Max DD %": metrics["max_drawdown"],
+            "Training Drawdown %": metrics["max_drawdown"],
             "Training Trades": metrics["trades"],
-            "Training Win Rate %": metrics["win_rate"],
-            "Robust Score": score_metrics(metrics),
+            "Score": score_metrics(metrics)
         })
 
     ranking = pd.DataFrame(candidates).sort_values(
-        ["Robust Score", "Training Return %"], ascending=False
+        "Score", ascending=False
     ).reset_index(drop=True)
+
     best = ranking.iloc[0]
-    best_params = {
-        "fast": int(best["fast"]), "slow": int(best["slow"]),
-        "rsi_buy": int(best["rsi_buy"]), "rsi_sell": int(best["rsi_sell"]),
+
+    params = {
+        "fast": int(best["fast"]),
+        "slow": int(best["slow"]),
+        "rsi_buy": int(best["rsi_buy"]),
+        "rsi_sell": int(best["rsi_sell"]),
         "macd_filter": bool(best["macd_filter"])
     }
-    test_ind = add_indicators(test, best_params["fast"], best_params["slow"])
-    test_metrics, test_equity, test_trades = run_backtest(
-        test_ind, balance, position, fee, "NEXUS Multi-Factor",
-        best_params, sl, tp, max_dd, trailing
+
+    test_ind = add_indicators(test, params["fast"], params["slow"])
+
+    metrics, equity, trades = run_backtest(
+        test_ind, balance, position, fee,
+        "NEXUS Multi-Factor", params,
+        sl, tp, maxdd, trailing
     )
-    return ranking, best_params, test_metrics, test_equity, test_trades, split
+
+    return ranking, params, metrics, equity, trades, split
 
 
-# ----------------------------- PAPER ACCOUNT -----------------------------
+# ------------------------- CHARTS -------------------------
 
-def execute_paper_trade(coin, data):
-    if not st.session_state.auto_trade:
-        return
-    candle_id = data["candle"]
-    if st.session_state.processed.get(coin) == candle_id:
-        return
-    st.session_state.processed[coin] = candle_id
-    pos = st.session_state.positions[coin]
-    price = data["price"]
-    fee = st.session_state.fee / 100
-    signal = data["signal"]
-
-    if signal == "BUY" and pos["qty"] == 0:
-        amount = st.session_state.cash * st.session_state.risk / 100
-        if amount < 5:
-            return
-        qty = amount * (1 - fee) / price
-        st.session_state.cash -= amount
-        pos["qty"], pos["cost"] = qty, amount
-        st.session_state.trades.append({
-            "Time": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
-            "Asset": coin, "Action": "BUY",
-            "Price EUR": round(price, 2), "Amount EUR": round(amount, 2)
-        })
-    elif signal == "SELL" and pos["qty"] > 0:
-        proceeds = pos["qty"] * price * (1 - fee)
-        st.session_state.cash += proceeds
-        st.session_state.trades.append({
-            "Time": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
-            "Asset": coin, "Action": "SELL",
-            "Price EUR": round(price, 2), "Amount EUR": round(proceeds, 2)
-        })
-        pos["qty"], pos["cost"] = 0.0, 0.0
-
-
-# ----------------------------- CHARTS -----------------------------
-
-def chart_layout(fig, height=400):
+def chart_style(fig, height=400):
     fig.update_layout(
-        height=height, template="plotly_dark",
-        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-        margin=dict(l=10, r=10, t=28, b=10),
-        font=dict(color="#AFC0D5"),
+        height=height,
+        template="plotly_dark",
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        margin=dict(l=10, r=10, t=35, b=10),
+        font=dict(color="#9FB1C8"),
         legend=dict(orientation="h", y=1.08),
         hovermode="x unified",
+        xaxis=dict(showgrid=False),
+        yaxis=dict(gridcolor="rgba(130,155,185,.10)")
     )
     return fig
 
 
-def market_chart(data):
-    df = data["history"].tail(120).copy()
+def price_chart(data):
+    df = data["history"].tail(120)
     dates = pd.to_datetime(df["time"], unit="ms", utc=True)
+
     fig = go.Figure()
+
     fig.add_trace(go.Candlestick(
-        x=dates, open=df["open"], high=df["high"], low=df["low"], close=df["close"],
-        name="Price", increasing_line_color="#35D6A2", decreasing_line_color="#FF647C"
+        x=dates,
+        open=df["open"],
+        high=df["high"],
+        low=df["low"],
+        close=df["close"],
+        name="Price",
+        increasing_line_color="#36D6A0",
+        decreasing_line_color="#FF657A"
     ))
-    fig.add_trace(go.Scatter(x=dates, y=df["EMA20"], name="EMA 20", line=dict(color="#78A6FF", width=1.4)))
-    fig.add_trace(go.Scatter(x=dates, y=df["EMA50"], name="EMA 50", line=dict(color="#B39AFF", width=1.4)))
-    return chart_layout(fig, 470)
 
-
-def equity_chart(eq, label="Strategy"):
-    fig = go.Figure()
     fig.add_trace(go.Scatter(
-        x=eq["Date"], y=eq["Equity"], name=label,
-        line=dict(color="#35D6A2", width=2.5), fill="tozeroy"
+        x=dates, y=df["EMA20"],
+        name="EMA 20",
+        line=dict(color="#6FA7FF", width=1.5)
     ))
-    return chart_layout(fig, 380)
+
+    fig.add_trace(go.Scatter(
+        x=dates, y=df["EMA50"],
+        name="EMA 50",
+        line=dict(color="#AD91FF", width=1.5)
+    ))
+
+    return chart_style(fig, 480)
 
 
-def metric_report(metrics):
+def equity_chart(eq):
+    fig = go.Figure()
+
+    fig.add_trace(go.Scatter(
+        x=eq["Date"],
+        y=eq["Equity"],
+        name="Equity",
+        line=dict(color="#36D6A0", width=2.5),
+        fill="tozeroy"
+    ))
+
+    return chart_style(fig, 370)
+
+
+def show_metrics(metrics):
     a, b, c, d = st.columns(4)
-    a.metric("Final equity", f'{metrics["final_equity"]:,.2f} EUR', f'{metrics["total_return"]:+.2f}%')
-    b.metric("Strategy return", f'{metrics["total_return"]:+.2f}%')
-    c.metric("Buy & hold", f'{metrics["buy_hold_return"]:+.2f}%')
-    d.metric("Closed trades", metrics["trades"])
-    e, f, g = st.columns(3)
-    e.metric("Win rate", f'{metrics["win_rate"]:.1f}%')
-    f.metric("Max drawdown", f'{metrics["max_drawdown"]:.2f}%')
-    pf = "∞" if metrics["profit_factor"] == float("inf") else f'{metrics["profit_factor"]:.2f}'
-    g.metric("Profit factor", pf)
+
+    a.metric(
+        "Final equity",
+        f'{metrics["final_equity"]:,.2f} EUR'
+    )
+
+    b.metric(
+        "Total return",
+        f'{metrics["total_return"]:+.2f}%'
+    )
+
+    c.metric(
+        "Win rate",
+        f'{metrics["win_rate"]:.1f}%'
+    )
+
+    d.metric(
+        "Maximum drawdown",
+        f'{metrics["max_drawdown"]:.2f}%'
+    )
 
 
-# ----------------------------- SIDEBAR / DATA -----------------------------
+# ------------------------- NAVIGATION -------------------------
 
-st.sidebar.markdown('<div class="nx-brand">◈ NEXUS</div><div class="nx-sub">TRADING INTELLIGENCE TERMINAL</div>', unsafe_allow_html=True)
+PAGES = [
+    "Overview",
+    "Trading Terminal",
+    "Markets",
+    "Portfolio",
+    "Strategy Lab",
+    "Backtesting",
+    "Trade Journal",
+    "AI Copilot",
+    "Settings"
+]
+
+st.sidebar.markdown(
+    '<div class="nx-logo">◈ NEXUS</div>'
+    '<div class="nx-subtitle">INTELLIGENCE TERMINAL</div>',
+    unsafe_allow_html=True
+)
+
 st.sidebar.divider()
-pages = ["Command Center", "Markets", "Portfolio", "Strategy Studio", "Backtest & AI", "Trade Journal", "AI Copilot", "Settings"]
-page = st.sidebar.radio("NAVIGATION", pages, label_visibility="visible")
+
+page = st.sidebar.radio(
+    "WORKSPACE",
+    PAGES,
+    label_visibility="visible"
+)
+
 st.sidebar.divider()
-st.sidebar.markdown("#### SIMULATION ACCOUNT")
-st.sidebar.metric("Starting capital", f'{st.session_state.starting_balance:,.0f} SEK')
-st.sidebar.markdown('<span class="pill">● PAPER MODE</span>', unsafe_allow_html=True)
-st.sidebar.caption("Kraken public market data · No real orders")
+
+st.sidebar.markdown("#### ACCOUNT")
+
+st.sidebar.metric(
+    "Starting capital",
+    f'{st.session_state.starting_balance:,.0f} SEK'
+)
+
+st.sidebar.markdown(
+    '<span class="status">● PAPER MODE ACTIVE</span>',
+    unsafe_allow_html=True
+)
+
+st.sidebar.caption("Public Kraken market data · Simulation only")
+
 st.sidebar.divider()
-st.sidebar.markdown("#### QUICK CONTROLS")
+
+st.sidebar.markdown("#### SYSTEM")
+
 st.sidebar.caption(f'Timeframe: {st.session_state.timeframe}')
-st.sidebar.caption(f'Auto paper trading: {"ON" if st.session_state.auto_trade else "OFF"}')
+st.sidebar.caption(
+    f'Auto trading: {"ON" if st.session_state.auto_trade else "OFF"}'
+)
 
-st_autorefresh(interval=int(st.session_state.refresh) * 1000, key="nexus_refresh")
-results, errors = {}, []
+if st.sidebar.button("Refresh market data", use_container_width=True):
+    st.cache_data.clear()
+    st.rerun()
+
+
+# ------------------------- FETCH LIVE DATA -------------------------
+
+st_autorefresh(
+    interval=int(st.session_state.refresh) * 1000,
+    key="nexus_refresh"
+)
+
+results = {}
+errors = []
+
 for coin in ["BTC", "ETH"]:
     try:
-        info = analyze(coin + "/EUR", st.session_state.timeframe)
-        results[coin] = info
-        execute_paper_trade(coin, info)
+        data = get_market_data(
+            coin + "/EUR",
+            st.session_state.timeframe
+        )
+        results[coin] = data
+        paper_trade(coin, data)
+
     except Exception as exc:
         errors.append(f"{coin}: {exc}")
 
-portfolio_value, profit = 0.0, 0.0
+
+portfolio_value = 0.0
+profit = 0.0
+
 if results:
-    marked_positions = sum(
+    holdings_value = sum(
         st.session_state.positions[c]["qty"] * results[c]["price"]
         for c in results
     )
-    total_eur = st.session_state.cash + marked_positions
+
+    total_eur = st.session_state.cash + holdings_value
+
     portfolio_value = total_eur * st.session_state.currency_rate
     profit = portfolio_value - st.session_state.starting_balance
-    st.session_state.history.append({"Time": datetime.now(), "Value": portfolio_value})
-    st.session_state.history = st.session_state.history[-600:]
+
+    st.session_state.history.append({
+        "Time": datetime.now(),
+        "Value": portfolio_value
+    })
+
+    st.session_state.history = st.session_state.history[-500:]
 
 
-# ----------------------------- HEADER -----------------------------
+# ------------------------- GLOBAL HEADER -------------------------
 
-st.markdown('<div class="eyebrow">NEXUS / DIGITAL ASSET RESEARCH</div>', unsafe_allow_html=True)
-header_left, header_right = st.columns([3, 1])
-with header_left:
+st.markdown(
+    '<div class="eyebrow">NEXUS / DIGITAL ASSET INTELLIGENCE</div>',
+    unsafe_allow_html=True
+)
+
+head1, head2 = st.columns([4, 1])
+
+with head1:
     st.title(page)
-    st.caption("Market intelligence · Quantitative research · Paper execution")
-with header_right:
-    st.markdown('<div style="text-align:right;padding-top:18px"><span class="pill">● SYSTEM ONLINE</span></div>', unsafe_allow_html=True)
+    st.caption("Market intelligence · Quantitative research · Portfolio analytics")
+
+with head2:
+    st.markdown(
+        '<div style="text-align:right;padding-top:20px">'
+        '<span class="status">● SYSTEM ONLINE</span></div>',
+        unsafe_allow_html=True
+    )
+
 if errors:
     st.warning("Market data issue: " + " | ".join(errors))
 
+st.divider()
+
 
 # ============================================================
-# COMMAND CENTER
+# OVERVIEW
 # ============================================================
 
-if page == "Command Center":
+if page == "Overview":
+
+    st.markdown("### Command center")
+
     if results:
-        st.markdown("### Account overview")
-        a, b, c, d = st.columns(4)
-        a.metric("Net liquidation value", f"{portfolio_value:,.2f} SEK")
-        b.metric("Unrealized + realized P/L", f"{profit:+,.2f} SEK")
-        c.metric("Available cash", f'{st.session_state.cash * 11.5:,.2f} SEK')
-        d.metric("Active positions", sum(p["qty"] > 0 for p in st.session_state.positions.values()))
 
-        left, right = st.columns([1.65, 1])
+        a, b, c, d = st.columns(4)
+
+        a.metric(
+            "Portfolio value",
+            f"{portfolio_value:,.2f} SEK"
+        )
+
+        b.metric(
+            "Total simulated P/L",
+            f"{profit:+,.2f} SEK",
+            f"{profit / st.session_state.starting_balance * 100:+.2f}%"
+        )
+
+        c.metric(
+            "Available cash",
+            f'{st.session_state.cash * 11.5:,.2f} SEK'
+        )
+
+        d.metric(
+            "Open positions",
+            sum(
+                p["qty"] > 0
+                for p in st.session_state.positions.values()
+            )
+        )
+
+        st.markdown("### Market intelligence")
+
+        left, right = st.columns([1.7, 1])
+
         with left:
-            st.markdown("### Portfolio trajectory")
-            if st.session_state.history:
-                hist = pd.DataFrame(st.session_state.history).set_index("Time")
-                fig = go.Figure(go.Scatter(
-                    x=hist.index, y=hist["Value"], mode="lines",
-                    line=dict(color="#35D6A2", width=2.5), fill="tozeroy", name="Equity"
+            st.markdown("#### Portfolio performance")
+
+            if len(st.session_state.history) > 1:
+                hist = pd.DataFrame(st.session_state.history)
+
+                fig = go.Figure()
+
+                fig.add_trace(go.Scatter(
+                    x=hist["Time"],
+                    y=hist["Value"],
+                    line=dict(color="#36D6A0", width=2.5),
+                    fill="tozeroy",
+                    name="Portfolio"
                 ))
-                st.plotly_chart(chart_layout(fig, 330), use_container_width=True)
+
+                st.plotly_chart(
+                    chart_style(fig, 350),
+                    use_container_width=True
+                )
+
+            else:
+                st.info("Portfolio history will appear as data is collected.")
+
         with right:
-            st.markdown("### Market pulse")
+            st.markdown("#### Live market pulse")
+
             for coin, data in results.items():
-                signal_color = "#35D6A2" if data["signal"] == "BUY" else "#FF647C" if data["signal"] == "SELL" else "#E9BE72"
+
+                color = (
+                    "#36D6A0" if data["signal"] == "BUY"
+                    else "#FF657A" if data["signal"] == "SELL"
+                    else "#E9BE72"
+                )
+
                 st.markdown(
-                    f'<div class="panel"><div class="panel-title">{coin} / EUR</div>'
-                    f'<div class="big-number">€{data["price"]:,.2f}</div>'
-                    f'<div style="color:{signal_color};font-weight:700;margin-top:5px">{data["signal"]}</div>'
-                    f'<div class="muted">RSI {data["rsi"]:.1f} · Change {data["change"]:+.2f}%</div></div>',
+                    f'<div class="panel">'
+                    f'<div class="panel-label">{coin} / EUR</div>'
+                    f'<div class="panel-value">€{data["price"]:,.2f}</div>'
+                    f'<div style="color:{color};font-weight:700">'
+                    f'{data["signal"]}</div>'
+                    f'<div class="panel-note">'
+                    f'RSI {data["rsi"]:.1f} · Change {data["change"]:+.2f}%'
+                    f'</div></div>',
                     unsafe_allow_html=True
                 )
-        st.markdown("### Market watch")
-        watch = pd.DataFrame([{
-            "Asset": c, "Last price (EUR)": round(d["price"], 2),
-            "Change (sample)": f'{d["change"]:+.2f}%', "RSI": round(d["rsi"], 1),
-            "Signal": d["signal"]
-        } for c, d in results.items()])
-        st.dataframe(watch, use_container_width=True, hide_index=True)
+
+        st.markdown("### Market overview")
+
+        market_table = pd.DataFrame([
+            {
+                "Asset": coin,
+                "Price EUR": round(data["price"], 2),
+                "Change": f'{data["change"]:+.2f}%',
+                "RSI": round(data["rsi"], 1),
+                "Signal": data["signal"]
+            }
+            for coin, data in results.items()
+        ])
+
+        st.dataframe(
+            market_table,
+            use_container_width=True,
+            hide_index=True
+        )
+
     else:
-        st.info("Waiting for market data from Kraken.")
+        st.info("Waiting for Kraken market data.")
+
+
+# ============================================================
+# TRADING TERMINAL
+# ============================================================
+
+elif page == "Trading Terminal":
+
+    if results:
+
+        coin = st.selectbox(
+            "Trading instrument",
+            list(results.keys())
+        )
+
+        data = results[coin]
+
+        a, b, c, d = st.columns(4)
+
+        a.metric("Last price", f'€{data["price"]:,.2f}')
+        b.metric("Market change", f'{data["change"]:+.2f}%')
+        c.metric("RSI", f'{data["rsi"]:.1f}')
+        d.metric("Signal", data["signal"])
+
+        st.markdown("### Advanced price chart")
+
+        st.plotly_chart(
+            price_chart(data),
+            use_container_width=True
+        )
+
+        tabs = st.tabs([
+            "Technical indicators",
+            "Market information",
+            "Trading rules"
+        ])
+
+        with tabs[0]:
+
+            df = data["history"]
+            latest = df.iloc[-1]
+
+            indicator_data = pd.DataFrame([
+                {"Indicator": "EMA 20", "Value": latest["EMA20"]},
+                {"Indicator": "EMA 50", "Value": latest["EMA50"]},
+                {"Indicator": "RSI", "Value": latest["RSI"]},
+                {"Indicator": "MACD", "Value": latest["MACD"]},
+                {"Indicator": "MACD Signal", "Value": latest["MACD_SIGNAL"]},
+                {"Indicator": "ATR", "Value": latest["ATR"]},
+                {"Indicator": "Bollinger Upper", "Value": latest["BB_UPPER"]},
+                {"Indicator": "Bollinger Lower", "Value": latest["BB_LOWER"]}
+            ])
+
+            st.dataframe(
+                indicator_data.round(4),
+                use_container_width=True,
+                hide_index=True
+            )
+
+        with tabs[1]:
+
+            st.write(f"Instrument: {coin}/EUR")
+            st.write(f"Timeframe: {st.session_state.timeframe}")
+            st.write("Exchange: Kraken")
+            st.write("Data type: Public OHLCV market data")
+            st.write("Execution: Paper trading only")
+
+        with tabs[2]:
+
+            st.write("The NEXUS Multi-Factor model combines trend and momentum.")
+            st.write("EMA measures trend direction.")
+            st.write("RSI measures momentum.")
+            st.write("MACD provides momentum confirmation.")
+            st.warning("Signals are experimental research outputs, not forecasts.")
+
+    else:
+        st.error("Market data unavailable.")
 
 
 # ============================================================
@@ -598,33 +1192,34 @@ if page == "Command Center":
 # ============================================================
 
 elif page == "Markets":
+
+    st.markdown("### Digital asset market monitor")
+
     if results:
-        selected = st.selectbox("Select instrument", list(results.keys()))
-        data = results[selected]
-        a, b, c, d = st.columns(4)
-        a.metric("Last price", f'€{data["price"]:,.2f}')
-        b.metric("Sample change", f'{data["change"]:+.2f}%')
-        c.metric("RSI (14)", f'{data["rsi"]:.1f}')
-        d.metric("Model signal", data["signal"])
-        st.markdown("### Price action")
-        st.plotly_chart(market_chart(data), use_container_width=True)
-        df = data["history"]
-        st.markdown("### Indicator monitor")
-        latest = df.iloc[-1]
-        indicators = pd.DataFrame([
-            {"Indicator": "EMA 20", "Value": f'{latest["EMA20"]:.2f}', "Reading": "Short-term trend"},
-            {"Indicator": "EMA 50", "Value": f'{latest["EMA50"]:.2f}', "Reading": "Medium-term trend"},
-            {"Indicator": "MACD", "Value": f'{latest["MACD"]:.4f}', "Reading": "Momentum"},
-            {"Indicator": "MACD signal", "Value": f'{latest["MACD_SIGNAL"]:.4f}', "Reading": "Momentum trigger"},
-            {"Indicator": "Bollinger upper", "Value": f'{latest["BB_UPPER"]:.2f}', "Reading": "Upper volatility band"},
-            {"Indicator": "Bollinger lower", "Value": f'{latest["BB_LOWER"]:.2f}', "Reading": "Lower volatility band"},
-            {"Indicator": "ATR", "Value": f'{latest["ATR"]:.2f}', "Reading": "Average true range"},
-            {"Indicator": "ATR %", "Value": f'{latest["ATR_PCT"]:.2f}%', "Reading": "Volatility relative to price"},
-        ])
-        st.dataframe(indicators, use_container_width=True, hide_index=True)
-        st.caption("Sample change is measured across the available recent candles, not an exact 24-hour return.")
+
+        for coin, data in results.items():
+
+            with st.container(border=True):
+
+                left, mid, right = st.columns([2, 2, 1])
+
+                left.markdown(f"#### {coin} / EUR")
+                left.metric("Price", f'€{data["price"]:,.2f}')
+
+                mid.metric(
+                    "Recent change",
+                    f'{data["change"]:+.2f}%'
+                )
+
+                right.metric("RSI", f'{data["rsi"]:.1f}')
+
+                st.plotly_chart(
+                    price_chart(data),
+                    use_container_width=True
+                )
+
     else:
-        st.error("No market data available.")
+        st.info("Waiting for market data.")
 
 
 # ============================================================
@@ -632,206 +1227,429 @@ elif page == "Markets":
 # ============================================================
 
 elif page == "Portfolio":
+
     if results:
+
+        st.markdown("### Portfolio overview")
+
         a, b, c = st.columns(3)
-        a.metric("Portfolio value", f"{portfolio_value:,.2f} SEK")
-        b.metric("Total P/L", f"{profit:+,.2f} SEK")
-        c.metric("Cash", f'{st.session_state.cash * 11.5:,.2f} SEK')
+
+        a.metric("Net asset value", f"{portfolio_value:,.2f} SEK")
+        b.metric("Profit / loss", f"{profit:+,.2f} SEK")
+        c.metric("Cash available", f'{st.session_state.cash * 11.5:,.2f} SEK')
+
         holdings = []
-        labels, values = ["Cash"], [st.session_state.cash]
+        labels = ["Cash"]
+        values = [st.session_state.cash]
+
         for coin, pos in st.session_state.positions.items():
-            price = results.get(coin, {}).get("price", 0.0)
+
+            price = results.get(coin, {}).get("price", 0)
             value = pos["qty"] * price
+
             holdings.append({
-                "Asset": coin, "Quantity": round(pos["qty"], 8),
-                "Entry allocation (EUR)": round(pos["cost"], 2),
-                "Market value (EUR)": round(value, 2)
+                "Asset": coin,
+                "Quantity": round(pos["qty"], 8),
+                "Entry cost EUR": round(pos["cost"], 2),
+                "Market value EUR": round(value, 2)
             })
+
             labels.append(coin)
             values.append(value)
-        left, right = st.columns([1.2, 1])
+
+        left, right = st.columns([1.3, 1])
+
         with left:
-            st.markdown("### Holdings")
-            st.dataframe(pd.DataFrame(holdings), use_container_width=True, hide_index=True)
+            st.markdown("#### Asset holdings")
+
+            st.dataframe(
+                pd.DataFrame(holdings),
+                use_container_width=True,
+                hide_index=True
+            )
+
         with right:
-            st.markdown("### Capital allocation")
-            pie = go.Figure(go.Pie(labels=labels, values=values, hole=.68))
-            st.plotly_chart(chart_layout(pie, 330), use_container_width=True)
+            st.markdown("#### Capital allocation")
+
+            fig = go.Figure(go.Pie(
+                labels=labels,
+                values=values,
+                hole=.68
+            ))
+
+            st.plotly_chart(
+                chart_style(fig, 330),
+                use_container_width=True
+            )
+
+        st.markdown("#### Portfolio history")
+
+        if len(st.session_state.history) > 1:
+
+            hist = pd.DataFrame(st.session_state.history)
+
+            fig = go.Figure(go.Scatter(
+                x=hist["Time"],
+                y=hist["Value"],
+                line=dict(color="#36D6A0", width=2),
+                fill="tozeroy"
+            ))
+
+            st.plotly_chart(
+                chart_style(fig, 330),
+                use_container_width=True
+            )
+
     else:
         st.info("Waiting for current prices.")
 
 
 # ============================================================
-# STRATEGY STUDIO
+# STRATEGY LAB
 # ============================================================
 
-elif page == "Strategy Studio":
-    st.markdown("### Quantitative strategy workspace")
-    st.write("Inspect the rules and indicators that power the NEXUS research engine.")
-    st.markdown("""
-    - **Trend:** EMA fast/slow relationship
-    - **Momentum:** RSI and MACD confirmation
-    - **Volatility:** Bollinger Bands and ATR
-    - **Risk:** fixed stop, take-profit, trailing stop and account drawdown guard
-    """)
+elif page == "Strategy Lab":
+
+    st.markdown("### Quantitative research workspace")
+
+    st.write(
+        "Explore the indicators and strategies used by the NEXUS research engine."
+    )
+
+    strategy = st.selectbox(
+        "Strategy",
+        STRATEGIES
+    )
+
+    st.markdown("#### Strategy description")
+
+    descriptions = {
+        "NEXUS Multi-Factor": "Combines EMA trend, RSI momentum and MACD confirmation.",
+        "NEXUS Baseline": "Uses EMA 20/50 and RSI conditions.",
+        "EMA Crossover": "Uses fast and slow EMA trend direction.",
+        "RSI Reversal": "Looks for RSI overbought and oversold conditions.",
+        "Bollinger Reversal": "Uses Bollinger Bands and RSI.",
+        "MACD Trend": "Combines EMA trend with MACD momentum."
+    }
+
+    st.info(descriptions[strategy])
+
     if results:
-        selected = st.selectbox("Instrument", list(results.keys()))
-        df = results[selected]["history"]
+
+        coin = st.selectbox(
+            "Asset analysis",
+            list(results.keys()),
+            key="strategy_coin"
+        )
+
+        df = results[coin]["history"]
         latest = df.iloc[-1]
+
         a, b, c, d = st.columns(4)
+
         a.metric("RSI", f'{latest["RSI"]:.1f}')
-        b.metric("MACD histogram", f'{latest["MACD_HIST"]:.4f}')
-        c.metric("Bollinger width", f'{latest["BB_WIDTH"] * 100:.2f}%')
-        d.metric("ATR", f'{latest["ATR"]:.2f}')
-        st.markdown("### Recent indicator readings")
+        b.metric("MACD", f'{latest["MACD"]:.4f}')
+        c.metric("ATR", f'{latest["ATR"]:.2f}')
+        d.metric("Bollinger width", f'{(latest["BB_UPPER"] - latest["BB_LOWER"]) / latest["BB_MID"] * 100:.2f}%')
+
+        st.markdown("#### Recent indicator history")
+
         st.dataframe(
-            df.tail(30)[["close", "EMA20", "EMA50", "RSI", "MACD", "MACD_SIGNAL", "BB_UPPER", "BB_LOWER", "ATR"]],
+            df.tail(30)[[
+                "close", "EMA20", "EMA50", "RSI",
+                "MACD", "MACD_SIGNAL", "ATR"
+            ]].round(4),
             use_container_width=True
         )
-    st.warning("Indicators describe historical price behaviour. They do not predict prices or guarantee profitable trades.")
+
+    st.warning(
+        "Historical indicators can produce false signals. "
+        "No strategy is guaranteed to be profitable."
+    )
 
 
 # ============================================================
-# BACKTEST & AI
+# BACKTESTING
 # ============================================================
 
-elif page == "Backtest & AI":
-    st.markdown("### Research, compare and optimize")
-    st.caption("All simulations are isolated from the paper account. No live orders are sent.")
+elif page == "Backtesting":
+
+    st.markdown("### Strategy research and optimization")
+
+    st.caption(
+        "Historical simulations are separate from your paper portfolio."
+    )
+
     with st.container(border=True):
-        st.markdown("#### Test configuration")
-        x1, x2, x3 = st.columns(3)
-        with x1:
-            asset = st.selectbox("Market", ["BTC/EUR", "ETH/EUR"], key="research_asset")
-        with x2:
-            tf = st.selectbox("Timeframe", ["15m", "1h", "4h", "1d"], index=1, key="research_tf")
-        with x3:
-            candles = st.selectbox("Candles", [150, 250, 500, 720], index=2, key="research_candles")
-        x4, x5, x6 = st.columns(3)
-        with x4:
-            balance = st.number_input("Starting balance (EUR)", 100.0, 1000000.0, 1000.0, 100.0, key="research_balance")
-        with x5:
-            position = st.slider("Position size (%)", 5, 100, 20, 5, key="research_position")
-        with x6:
-            fee = st.number_input("Fee per order (%)", 0.0, 2.0, 0.4, 0.05, key="research_fee")
-        st.markdown("#### Risk controls")
-        r1, r2, r3, r4 = st.columns(4)
-        with r1:
-            sl = st.slider("Stop-loss (%)", 0.0, 20.0, 5.0, 0.5, key="research_sl")
-        with r2:
-            tp = st.slider("Take-profit (%)", 0.0, 40.0, 10.0, 0.5, key="research_tp")
-        with r3:
-            trailing = st.slider("Trailing stop (%)", 0.0, 20.0, 0.0, 0.5, key="research_trailing")
-        with r4:
-            maxdd = st.slider("Max account drawdown (%)", 0.0, 50.0, 15.0, 1.0, key="research_maxdd")
-        st.caption("Set a risk control to 0 to disable it. Stop-loss is checked before take-profit if both are touched in the same candle.")
-        btn1, btn2 = st.columns(2)
-        with btn1:
-            compare = st.button("Run strategy comparison", type="primary", use_container_width=True)
-        with btn2:
-            optimize = st.button("Run robust optimizer", use_container_width=True)
 
-    if compare or optimize:
+        st.markdown("#### Test configuration")
+
+        a, b, c = st.columns(3)
+
+        with a:
+            asset = st.selectbox(
+                "Market",
+                ["BTC/EUR", "ETH/EUR"],
+                key="bt_asset"
+            )
+
+        with b:
+            timeframe = st.selectbox(
+                "Timeframe",
+                ["15m", "1h", "4h", "1d"],
+                index=1,
+                key="bt_tf"
+            )
+
+        with c:
+            candles = st.selectbox(
+                "Historical candles",
+                [150, 250, 500, 720],
+                index=2,
+                key="bt_candles"
+            )
+
+        a, b, c = st.columns(3)
+
+        with a:
+            balance = st.number_input(
+                "Starting balance EUR",
+                min_value=100.0,
+                max_value=1000000.0,
+                value=1000.0,
+                step=100.0
+            )
+
+        with b:
+            position = st.slider(
+                "Position size %",
+                5, 100, 20, 5
+            )
+
+        with c:
+            fee = st.number_input(
+                "Fee per order %",
+                0.0, 2.0, 0.4, 0.05
+            )
+
+        st.markdown("#### Risk management")
+
+        a, b, c, d = st.columns(4)
+
+        with a:
+            sl = st.slider("Stop-loss %", 0.0, 20.0, 5.0, .5)
+
+        with b:
+            tp = st.slider("Take-profit %", 0.0, 40.0, 10.0, .5)
+
+        with c:
+            trailing = st.slider("Trailing stop %", 0.0, 20.0, 0.0, .5)
+
+        with d:
+            maxdd = st.slider("Maximum drawdown %", 0.0, 50.0, 15.0, 1.0)
+
+        st.caption("Set a risk control to zero to disable it.")
+
+        a, b = st.columns(2)
+
+        with a:
+            run_compare = st.button(
+                "Run strategy comparison",
+                type="primary",
+                use_container_width=True
+            )
+
+        with b:
+            run_optimizer = st.button(
+                "Run AI parameter optimizer",
+                use_container_width=True
+            )
+
+    if run_compare or run_optimizer:
+
         try:
-            with st.spinner("Fetching Kraken candles and running research..."):
-                hist = fetch_history(asset, tf, candles)
-                if compare:
+
+            with st.spinner("Downloading market history and running simulations..."):
+
+                hist = fetch_history(asset, timeframe, candles)
+
+                if run_compare:
+
                     specs = [
+                        ("NEXUS Multi-Factor", {}),
                         ("NEXUS Baseline", {}),
                         ("EMA Crossover", {}),
                         ("RSI Reversal", {"rsi_buy": 30, "rsi_sell": 70}),
                         ("Bollinger Reversal", {}),
-                        ("MACD Trend", {}),
-                        ("NEXUS Multi-Factor", {"fast": 20, "slow": 50, "rsi_buy": 48, "rsi_sell": 72}),
+                        ("MACD Trend", {})
                     ]
-                    rows = []
-                    base_detail = None
-                    for name, params in specs:
-                        ind = add_indicators(hist, params.get("fast", 20), params.get("slow", 50))
-                        m, eq, tr = run_backtest(ind, balance, position, fee, name, params, sl, tp, maxdd, trailing)
-                        rows.append({"Strategy": name, **m, "Robust score": score_metrics(m)})
-                        if name == "NEXUS Multi-Factor":
-                            base_detail = (m, eq, tr)
-                    st.session_state.last_comparison = {
-                        "asset": asset, "timeframe": tf, "candles": len(hist), "rows": rows
-                    }
-                    if base_detail:
-                        m, eq, tr = base_detail
-                        st.session_state.last_backtest = {
-                            "asset": asset, "timeframe": tf, "candles": len(hist),
-                            "metrics": m, "equity": eq, "trades": tr,
-                            "start": balance, "strategy": "NEXUS Multi-Factor"
-                        }
-                if optimize:
-                    ranking, params, metrics, eq, trades, split = optimize_strategy(
-                        hist, balance, position, fee, sl, tp, maxdd, trailing
-                    )
-                    st.session_state.last_optimization = {
-                        "asset": asset, "timeframe": tf, "candles": len(hist),
-                        "ranking": ranking, "params": params, "metrics": metrics,
-                        "equity": eq, "trades": trades, "start": balance,
-                        "train_candles": split, "test_candles": len(hist) - split
-                    }
-        except Exception as exc:
-            st.error(f"Research run failed: {exc}")
 
-    comparison = st.session_state.get("last_comparison")
+                    rows = []
+
+                    for name, params in specs:
+
+                        ind = add_indicators(
+                            hist,
+                            params.get("fast", 20),
+                            params.get("slow", 50)
+                        )
+
+                        metrics, equity, trades = run_backtest(
+                            ind, balance, position, fee,
+                            name, params, sl, tp, maxdd, trailing
+                        )
+
+                        rows.append({
+                            "Strategy": name,
+                            **metrics,
+                            "Score": score_metrics(metrics)
+                        })
+
+                        if name == "NEXUS Multi-Factor":
+
+                            st.session_state.backtest = {
+                                "metrics": metrics,
+                                "equity": equity,
+                                "trades": trades,
+                                "asset": asset,
+                                "timeframe": timeframe
+                            }
+
+                    st.session_state.comparison = rows
+
+                if run_optimizer:
+
+                    ranking, params, metrics, equity, trades, split = optimize_strategy(
+                        hist, balance, position, fee,
+                        sl, tp, maxdd, trailing
+                    )
+
+                    st.session_state.optimization = {
+                        "ranking": ranking,
+                        "params": params,
+                        "metrics": metrics,
+                        "equity": equity,
+                        "trades": trades,
+                        "train": split,
+                        "test": len(hist) - split,
+                        "asset": asset,
+                        "timeframe": timeframe
+                    }
+
+        except Exception as exc:
+            st.error(f"Research error: {exc}")
+
+    comparison = st.session_state.comparison
+
     if comparison:
+
         st.divider()
         st.markdown("### Strategy leaderboard")
-        st.caption(f'{comparison["asset"]} · {comparison["timeframe"]} · {comparison["candles"]} completed candles')
-        comp_df = pd.DataFrame(comparison["rows"])
-        display = comp_df[[
-            "Strategy", "final_equity", "total_return", "buy_hold_return",
-            "trades", "win_rate", "max_drawdown", "profit_factor", "Robust score"
+
+        comp = pd.DataFrame(comparison)
+
+        display = comp[[
+            "Strategy", "final_equity", "total_return",
+            "trades", "win_rate", "max_drawdown",
+            "profit_factor", "Score"
         ]].rename(columns={
-            "final_equity": "Final EUR", "total_return": "Return %",
-            "buy_hold_return": "Buy & hold %", "trades": "Trades",
-            "win_rate": "Win rate %", "max_drawdown": "Max DD %",
+            "final_equity": "Final EUR",
+            "total_return": "Return %",
+            "trades": "Trades",
+            "win_rate": "Win rate %",
+            "max_drawdown": "Max drawdown %",
             "profit_factor": "Profit factor"
         })
-        st.dataframe(display, use_container_width=True, hide_index=True)
-        best = comp_df.sort_values("Robust score", ascending=False).iloc[0]
-        st.info(f'Highest risk-adjusted research score: {best["Strategy"]}. Score is a ranking aid, not a forecast.')
 
-    baseline = st.session_state.get("last_backtest")
-    if baseline:
-        st.divider()
-        st.markdown("### Detailed simulation")
-        st.caption(f'{baseline["asset"]} · {baseline["timeframe"]} · {baseline["candles"]} candles')
-        metric_report(baseline["metrics"])
-        st.plotly_chart(equity_chart(baseline["equity"], baseline["strategy"]), use_container_width=True)
-        if baseline["trades"]:
-            trade_df = pd.DataFrame(baseline["trades"])
-            st.dataframe(trade_df, use_container_width=True, hide_index=True)
-            st.download_button("Export strategy trades", trade_df.to_csv(index=False), "nexus_strategy_trades.csv", "text/csv")
-
-    optimized = st.session_state.get("last_optimization")
-    if optimized:
-        st.divider()
-        st.markdown("### Robust optimizer — holdout report")
-        st.caption(
-            f'Optimizer trained on {optimized["train_candles"]} candles; '
-            f'holdout period contains {optimized["test_candles"]} candles.'
+        st.dataframe(
+            display.round(3),
+            use_container_width=True,
+            hide_index=True
         )
-        p = optimized["params"]
+
+        best = comp.sort_values("Score", ascending=False).iloc[0]
+
+        st.info(
+            f'Highest research score: {best["Strategy"]}. '
+            "This is a historical ranking, not a prediction."
+        )
+
+    bt = st.session_state.backtest
+
+    if bt:
+
+        st.divider()
+        st.markdown("### Detailed backtest")
+
+        show_metrics(bt["metrics"])
+
+        st.plotly_chart(
+            equity_chart(bt["equity"]),
+            use_container_width=True
+        )
+
+        if bt["trades"]:
+
+            trades_df = pd.DataFrame(bt["trades"])
+
+            st.dataframe(
+                trades_df,
+                use_container_width=True,
+                hide_index=True
+            )
+
+            st.download_button(
+                "Download backtest trades",
+                trades_df.to_csv(index=False),
+                "nexus_backtest.csv",
+                "text/csv"
+            )
+
+    opt = st.session_state.optimization
+
+    if opt:
+
+        st.divider()
+        st.markdown("### Optimizer holdout results")
+
+        st.caption(
+            f'Training: {opt["train"]} candles · '
+            f'Test: {opt["test"]} candles'
+        )
+
+        p = opt["params"]
+
         st.markdown(
-            f'<span class="pill">EMA {p["fast"]}/{p["slow"]}</span> '
-            f'<span class="pill">RSI buy ≥ {p["rsi_buy"]}</span> '
-            f'<span class="pill">RSI exit ≥ {p["rsi_sell"]}</span>',
+            f'<span class="tag">EMA {p["fast"]}/{p["slow"]}</span> '
+            f'<span class="tag">RSI buy {p["rsi_buy"]}</span> '
+            f'<span class="tag">RSI exit {p["rsi_sell"]}</span>',
             unsafe_allow_html=True
         )
-        metric_report(optimized["metrics"])
-        st.plotly_chart(equity_chart(optimized["equity"], "Optimized holdout"), use_container_width=True)
-        st.markdown("#### Top training candidates")
-        st.dataframe(optimized["ranking"].head(20), use_container_width=True, hide_index=True)
-        if optimized["trades"]:
-            test_trades = pd.DataFrame(optimized["trades"])
-            st.dataframe(test_trades, use_container_width=True, hide_index=True)
-            st.download_button("Export holdout trades", test_trades.to_csv(index=False), "nexus_holdout_trades.csv", "text/csv")
-        st.warning("The holdout period is more useful than the training ranking, but one holdout is not proof of future performance. Repeat across markets, timeframes and different date ranges.")
 
-    st.caption("Models omit or simplify spread, slippage, liquidity, latency and exchange outages. Historical simulation is not a promise of future returns.")
+        show_metrics(opt["metrics"])
+
+        st.plotly_chart(
+            equity_chart(opt["equity"]),
+            use_container_width=True
+        )
+
+        st.markdown("#### Highest-ranked training parameters")
+
+        st.dataframe(
+            opt["ranking"].head(20),
+            use_container_width=True,
+            hide_index=True
+        )
+
+        st.warning(
+            "A holdout result is not proof of future performance. "
+            "Test different periods and markets before drawing conclusions."
+        )
+
+    st.caption(
+        "Simulations simplify spread, slippage, liquidity, latency and outages. "
+        "Historical performance does not guarantee future results."
+    )
 
 
 # ============================================================
@@ -839,18 +1657,38 @@ elif page == "Backtest & AI":
 # ============================================================
 
 elif page == "Trade Journal":
+
+    st.markdown("### Paper trading activity")
+
     trades = st.session_state.trades
+
     a, b, c = st.columns(3)
-    a.metric("Total simulated orders", len(trades))
+
+    a.metric("Total orders", len(trades))
     b.metric("Buy orders", sum(t["Action"] == "BUY" for t in trades))
     c.metric("Sell orders", sum(t["Action"] == "SELL" for t in trades))
+
     if trades:
+
         journal = pd.DataFrame(trades)
-        st.dataframe(journal, use_container_width=True, hide_index=True)
-        st.download_button("Export journal CSV", journal.to_csv(index=False), "nexus_paper_journal.csv", "text/csv")
+
+        st.dataframe(
+            journal,
+            use_container_width=True,
+            hide_index=True
+        )
+
+        st.download_button(
+            "Export journal",
+            journal.to_csv(index=False),
+            "nexus_trade_journal.csv",
+            "text/csv"
+        )
+
     else:
-        st.info("No paper trades yet.")
-    st.caption("Journal is currently held in the active app session and may reset when the app restarts.")
+        st.info("Your paper trading journal is empty.")
+
+    st.caption("The journal is stored in the current app session and may reset on restart.")
 
 
 # ============================================================
@@ -858,79 +1696,123 @@ elif page == "Trade Journal":
 # ============================================================
 
 elif page == "AI Copilot":
-    st.markdown("### NEXUS intelligence assistant")
-    st.caption("Ask about indicators, strategy behaviour, risk controls or your simulation results.")
+
+    st.markdown("### NEXUS Intelligence")
+
+    st.caption(
+        "Ask questions about technical indicators, strategies, "
+        "risk management and your simulations."
+    )
+
     api_key = os.getenv("OPENAI_API_KEY", "")
+
     try:
         api_key = st.secrets.get("OPENAI_API_KEY", api_key)
     except Exception:
         pass
+
     for message in st.session_state.chat:
+
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
-    prompt = st.chat_input("Ask NEXUS...")
+
+    prompt = st.chat_input("Ask NEXUS anything...")
+
     if prompt:
-        st.session_state.chat.append({"role": "user", "content": prompt})
+
+        st.session_state.chat.append({
+            "role": "user",
+            "content": prompt
+        })
+
         with st.chat_message("user"):
             st.markdown(prompt)
-        market_context = "\n".join(
-            f'{coin}: €{d["price"]:.2f}, RSI {d["rsi"]:.1f}, signal {d["signal"]}'
+
+        market_context = "\n".join([
+            f'{coin}: EUR {d["price"]:.2f}, RSI {d["rsi"]:.1f}, signal {d["signal"]}'
             for coin, d in results.items()
-        )
-        bt = st.session_state.get("last_backtest")
-        opt = st.session_state.get("last_optimization")
-        bt_context = ""
-        if bt:
-            m = bt["metrics"]
-            bt_context = f'Last strategy simulation: return {m["total_return"]:.2f}%, max drawdown {m["max_drawdown"]:.2f}%, trades {m["trades"]}.'
-        opt_context = ""
-        if opt:
-            m = opt["metrics"]
-            opt_context = f'Optimizer holdout: return {m["total_return"]:.2f}%, max drawdown {m["max_drawdown"]:.2f}%, params {opt["params"]}.'
+        ])
+
         system = f"""
-You are NEXUS AI, a clear educational crypto research assistant.
-Live market snapshot: {market_context}
-Paper portfolio: {portfolio_value:.2f} SEK; simulated P/L: {profit:.2f} SEK.
-{bt_context}
-{opt_context}
-Explain uncertainty, fees, slippage, overfitting and drawdown when relevant.
-Never promise returns, invent market facts, or tell the user to risk real money.
-This application is paper-trading simulation only, not personalized financial advice.
+You are NEXUS AI, an advanced educational crypto research assistant.
+
+Current market data:
+{market_context}
+
+Simulated portfolio value: {portfolio_value:.2f} SEK.
+Simulated profit/loss: {profit:.2f} SEK.
+
+Explain technical indicators clearly.
+Be honest about uncertainty.
+Discuss fees, slippage, drawdown and overfitting when relevant.
+Never promise profits or invent market facts.
+Never encourage the user to risk real money.
+This app is paper trading only.
 """
+
         answer = ""
+
         with st.chat_message("assistant"):
+
             if api_key:
+
                 try:
+
                     from openai import OpenAI
+
                     client = OpenAI(api_key=api_key)
+
                     response = client.chat.completions.create(
                         model="gpt-4o-mini",
-                        messages=[{"role": "system", "content": system}, *st.session_state.chat[-10:]],
-                        temperature=0.3,
+                        messages=[
+                            {"role": "system", "content": system},
+                            *st.session_state.chat[-10:]
+                        ],
+                        temperature=.3
                     )
-                    answer = response.choices[0].message.content or "No response was generated."
+
+                    answer = (
+                        response.choices[0].message.content
+                        or "No response generated."
+                    )
+
                 except Exception as exc:
                     answer = f"AI connection failed: {exc}"
+
             else:
+
                 q = prompt.lower()
-                if "macd" in q:
-                    answer = "MACD compares two exponential moving averages and a signal line. It is a momentum indicator; crossovers can lag and produce false signals in sideways markets."
+
+                if "rsi" in q:
+                    answer = "RSI measures momentum on a scale from 0 to 100. Values above 70 are often considered overbought and below 30 oversold. These levels are not automatic trading signals."
+
+                elif "macd" in q:
+                    answer = "MACD compares two exponential moving averages and a signal line. It can help identify momentum changes, but it can lag and produce false signals."
+
+                elif "ema" in q:
+                    answer = "EMA is an exponential moving average. A faster EMA reacts more quickly to price changes than a slower EMA. Crossovers can help describe trends."
+
                 elif "bollinger" in q:
-                    answer = "Bollinger Bands show a moving average with volatility bands. Touching a band is not automatically a buy or sell signal; price can ride a band during a strong trend."
-                elif "atr" in q or "trailing" in q:
-                    answer = "ATR estimates recent price range, not direction. It can help size volatility-based stops, but a stop can fill worse than expected during fast markets."
-                elif "optimi" in q or "overfit" in q:
-                    answer = "The optimizer ranks a grid on a training segment, then evaluates the selected parameters on a later holdout segment. If the holdout is weak, the strategy has not demonstrated robust performance. Try other markets and date ranges."
-                elif "minus" in q or "förlust" in q or "backtest" in q:
-                    answer = "Check return against buy-and-hold, drawdown, fees, number of trades and the holdout result. A tiny sample can be misleading. A negative test is useful information: it shows the rules need more research."
+                    answer = "Bollinger Bands measure volatility around a moving average. Price touching a band does not automatically mean it will reverse."
+
                 elif "risk" in q or "stop" in q:
-                    answer = "Stop-loss, take-profit, trailing stop and maximum drawdown rules can structure a simulation, but gaps, spread, slippage and outages mean they cannot guarantee a maximum loss."
-                elif "portfolio" in q or "saldo" in q or "balance" in q:
-                    answer = f"Your simulated portfolio is currently worth {portfolio_value:.2f} SEK, with simulated P/L of {profit:+.2f} SEK."
+                    answer = "Stop-loss and position sizing can structure risk in a simulation. Real execution can differ because of gaps, fees, spread and slippage."
+
+                elif "portfolio" in q or "balance" in q:
+                    answer = f"Your simulated portfolio is currently worth {portfolio_value:.2f} SEK. Simulated P/L: {profit:+.2f} SEK."
+
+                elif "backtest" in q or "optimization" in q:
+                    answer = "Backtesting evaluates historical rules. Compare results with buy-and-hold, drawdown, trade count and a separate test period. Good historical results do not guarantee future performance."
+
                 else:
-                    answer = "I can explain RSI, EMA, MACD, Bollinger Bands, ATR, stop-loss, trailing stops, drawdown, optimization and backtest results. Configure OPENAI_API_KEY in Streamlit Secrets to enable the full AI model."
+                    answer = "I can explain RSI, EMA, MACD, Bollinger Bands, ATR, backtesting, optimization and risk management. Add OPENAI_API_KEY in Streamlit Secrets to enable the full AI model."
+
             st.markdown(answer)
-        st.session_state.chat.append({"role": "assistant", "content": answer})
+
+        st.session_state.chat.append({
+            "role": "assistant",
+            "content": answer
+        })
 
 
 # ============================================================
@@ -938,47 +1820,123 @@ This application is paper-trading simulation only, not personalized financial ad
 # ============================================================
 
 elif page == "Settings":
+
     st.markdown("### Terminal configuration")
-    st.markdown("#### Paper trading")
-    st.session_state.risk = st.slider("Position size (% of available cash)", 5, 50, int(st.session_state.risk), 5)
-    st.session_state.fee = st.slider("Simulated fee (%)", 0.0, 1.0, float(st.session_state.fee), 0.05)
+
+    st.markdown("#### Paper account")
+
+    st.session_state.position_size = st.slider(
+        "Position size (% of available cash)",
+        5, 50,
+        int(st.session_state.position_size),
+        5
+    )
+
+    st.session_state.fee = st.slider(
+        "Simulated transaction fee (%)",
+        0.0, 1.0,
+        float(st.session_state.fee),
+        .05
+    )
+
+    st.divider()
+
+    st.markdown("#### Market data")
+
     st.session_state.timeframe = st.selectbox(
-        "Market timeframe", ["15m", "1h", "4h", "1d"],
-        index=["15m", "1h", "4h", "1d"].index(st.session_state.timeframe)
+        "Default timeframe",
+        ["15m", "1h", "4h", "1d"],
+        index=["15m", "1h", "4h", "1d"].index(
+            st.session_state.timeframe
+        )
     )
+
     st.session_state.refresh = st.select_slider(
-        "Dashboard refresh", options=[30, 60, 120, 300], value=int(st.session_state.refresh)
+        "Dashboard refresh interval",
+        options=[30, 60, 120, 300],
+        value=int(st.session_state.refresh)
     )
+
     st.divider()
+
     st.markdown("#### Automation")
-    st.session_state.auto_trade = st.toggle("Enable automatic paper trading", value=st.session_state.auto_trade)
-    st.caption("This only simulates trades using public market data. It never sends real orders.")
+
+    st.session_state.auto_trade = st.toggle(
+        "Enable automatic paper trading",
+        value=st.session_state.auto_trade
+    )
+
+    st.caption(
+        "This only simulates trades. It never sends real exchange orders."
+    )
+
     st.divider()
-    st.markdown("#### Account")
-    st.write(f'Starting balance: {st.session_state.starting_balance:.2f} SEK')
-    st.write("Display conversion: 1 EUR = 11.5 SEK (fixed estimate, not a live FX rate).")
-    st.divider()
+
     st.markdown("#### AI connection")
-    st.write("Optional: add OPENAI_API_KEY in Streamlit Cloud → App settings → Secrets.")
-    st.code('OPENAI_API_KEY = "your-api-key"', language="toml")
-    st.warning("Never put your API key in GitHub or directly in this Python file.")
+
+    st.write(
+        "Optional: add an OpenAI API key in Streamlit Cloud → "
+        "App settings → Secrets."
+    )
+
+    st.code(
+        'OPENAI_API_KEY = "your-api-key"',
+        language="toml"
+    )
+
+    st.warning(
+        "Never publish your API key in GitHub or put it directly in this file."
+    )
+
     st.divider()
+
+    st.markdown("#### Account information")
+
+    st.write(
+        f'Starting balance: {st.session_state.starting_balance:.2f} SEK'
+    )
+
+    st.write(
+        "Display conversion: 1 EUR = 11.5 SEK. "
+        "This is a fixed estimate, not a live exchange rate."
+    )
+
+    st.divider()
+
     st.markdown("#### Reset simulation")
-    if st.button("Reset virtual account and journal"):
-        st.session_state.cash = st.session_state.starting_balance / st.session_state.currency_rate
-        st.session_state.positions = {"BTC": {"qty": 0.0, "cost": 0.0}, "ETH": {"qty": 0.0, "cost": 0.0}}
+
+    if st.button(
+        "Reset virtual account",
+        type="primary"
+    ):
+
+        st.session_state.cash = (
+            st.session_state.starting_balance
+            / st.session_state.currency_rate
+        )
+
+        st.session_state.positions = {
+            "BTC": {"qty": 0.0, "cost": 0.0},
+            "ETH": {"qty": 0.0, "cost": 0.0}
+        }
+
         st.session_state.trades = []
         st.session_state.processed = {}
         st.session_state.history = []
+
         st.success("Virtual account reset.")
 
 
-# ----------------------------- FOOTER -----------------------------
+# ------------------------- FOOTER -------------------------
 
 st.divider()
+
 st.markdown(
-    '<div style="text-align:center;color:#7589A4;font:500 10px DM Mono;letter-spacing:2px;">'
-    '◈ NEXUS INTELLIGENCE TERMINAL · PAPER TRADING ONLY · HISTORICAL RESULTS ARE NOT PREDICTIONS'
+    '<div style="text-align:center;color:#637A96;'
+    'font-family:DM Mono,monospace;font-size:10px;'
+    'letter-spacing:2px;padding:15px">'
+    '◈ NEXUS INTELLIGENCE TERMINAL · PAPER TRADING ONLY'
+    '<br>HISTORICAL RESULTS ARE NOT PREDICTIONS'
     '</div>',
-    unsafe_allow_html=True,
+    unsafe_allow_html=True
 )
